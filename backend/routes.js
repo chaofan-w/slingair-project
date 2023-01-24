@@ -1,8 +1,11 @@
 const router = require("express").Router();
+const { getAllSeats } = require("./routeCallbacks");
 
 router.get("/", (req, res) => {
   sendResponse(res, 200, "data respond", "this is the homepage message");
 });
+
+router.get("/api/allseats", getAllSeats);
 
 router.get("*", (req, res) => {
   sendResponse(
