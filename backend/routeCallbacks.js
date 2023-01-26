@@ -108,22 +108,61 @@ const getOneCustomer = async (req, res) => {
   await client.connect();
   console.log("connected");
   try {
+    // ------https://www.mongodb.com/docs/manual/core/index-case-insensitive/------
+    // create case insensitive index on collection with a defualt collation to ignore case when comparing two strings
+
+    // //----- before creating new index, check and drop existing index to avoid conflict, https://www.mongodb.com/docs/manual/reference/method/db.collection.dropIndex/-----------------
+    //     await db.collection("customers").dropIndex({ last_name: 1 });
+
+    // // ----------- create new index, {last_name:1}, it indicates the field to create index to, 1 means in ascending order, the key name will be last_name_1
+    //     await db.collection("customers").createIndex(
+    //       { last_name: 1 },
+    // //------- in collation, to define the rule, locale is mandatory, 'en' is english, strength:1 means only compare the characters, ignore the case
+    //       {
+    //         collation: {
+    //           locale: "en",
+    //           strength: 1,
+    //         },
+    //       }
+    //     );
+
+    // await db.collection("customers").createIndex(
+    //   {
+    //     email: 1,
+    //   },
+    //   {
+    //     collation: {
+    //       locale: "en",
+    //       strength: 1,
+    //     },
+    //   }
+    // );
     const customer = await db
       .collection("customers")
       .find({
         //https://stackoverflow.com/questions/26699885/how-can-i-use-a-regex-variable-in-a-query-for-mongodb use dynampic value in regex of mongodb plus options, but it is not ok for query here
         // last_name: { $regex: "^" + last_name, $options: "i" },
         // email: { $regex: "^" + email, $options: "i" },
-        last_name:
-          last_name.slice(0, 1).toUpperCase() +
-          last_name.slice(1).toLowerCase(),
-        email: email.toLowerCase(),
+        last_name: last_name,
+        email: email,
       })
+      .collation({ locale: "en", strength: 1 })
       .toArray();
+
+    const orderInfo = await db
+      .collection("reservations")
+      .find({ email: email.toLowerCase() })
+      .toArray();
+
     client.close();
     console.log("disconnected");
     if (customer.length > 0) {
-      sendResponse(res, 200, customer, "");
+      sendResponse(
+        res,
+        200,
+        { ...customer[0], reservations: [...orderInfo] },
+        ""
+      );
     } else {
       sendResponse(res, 404, null, "no customer found");
     }
@@ -142,7 +181,7 @@ const addCustomer = async (req, res) => {
       .find({ email: email })
       .toArray();
 
-    console.log(accountExist);
+    // console.log(accountExist);
 
     if (accountExist.length > 0) {
       sendResponse(
@@ -164,6 +203,115 @@ const addCustomer = async (req, res) => {
   }
 };
 
+const deActivateCustomers = async (req, res) => {
+  await client.connect();
+  console.log("connected");
+  const emailArr = req.body;
+  console.log(emailArr);
+  try {
+    const updatedCustomers = await db
+      .collection("customers")
+      .updateMany(
+        { email: { $in: emailArr }, activated: true },
+        { $set: { activated: false } }
+      );
+    client.close();
+    console.log("disconnected");
+    if (updatedCustomers.modifiedCount > 0) {
+      sendResponse(
+        res,
+        200,
+        null,
+        `${updatedCustomers.modifiedCount} accounts have been deactivated`
+      );
+      return;
+    } else {
+      sendResponse(res, 404, null, "the accounts are already deactivated");
+      return;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const changeSeatsAvailablity = async (req, res) => {
+  const { flightNum } = req.body;
+  await client.connect();
+  console.log("connected");
+  try {
+    // await db.collection("reservations").createIndex(
+    //   { "order.flight": 1 },
+    //   {
+    //     collation: { locale: "en", strength: 1 },
+    //   }
+    // );
+
+    const allReservations = await db
+      .collection("reservations")
+      .find({ "order.flight": flightNum })
+      .collation({ locale: "en", strength: 1 })
+      .toArray();
+    client.close();
+    console.log("disconnected");
+    if (allReservations.length > 0) {
+      const reservedSeats = allReservations.reduce((pre, curr) => {
+        return [
+          ...pre,
+          ...curr.order.find((f) => f.flight === flightNum.toUpperCase()).seat,
+        ];
+      }, []);
+      console.log(reservedSeats);
+
+      await db.collection(`${flightNum.toUpperCase()}`).updateMany(
+        { _id: { $in: reservedSeats } },
+        {
+          $set: {
+            isAvailable: false,
+          },
+        }
+      );
+      await db.collection(`${flightNum.toUpperCase()}`).updateMany(
+        { _id: { $nin: reservedSeats } },
+        {
+          $set: {
+            isAvailable: true,
+          },
+        }
+      );
+
+      sendResponse(res, 200, reservedSeats, "");
+    } else {
+      sendResponse(res, 404, null, "no reservation in database so far.");
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const addReservations = async (req, res) => {
+  await client.connect();
+  console.log("connected");
+  const {
+    email,
+    order: [{ flight, seat }],
+  } = req.body;
+  console.log(flight);
+  console.log(seat);
+  try {
+    const newReservations = await db.collection("reservations").insertOne({
+      email: email,
+      order: [{ flight: flight, seat: seat }],
+    });
+    client.close();
+    console.log("disconnected");
+    sendResponse(res, 200, null, "tickets booked successfully");
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+// ----------https://www.prisma.io/dataguide/mongodb/managing-documents----------
+
 //-------- send response function for each call back--------------------------
 
 function sendResponse(res, status, data, message = "") {
@@ -182,4 +330,7 @@ module.exports = {
   getFlightReservations,
   getOneCustomer,
   addCustomer,
+  deActivateCustomers,
+  changeSeatsAvailablity,
+  addReservations,
 };
