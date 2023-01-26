@@ -1,11 +1,23 @@
 const router = require("express").Router();
-const { getAllSeats } = require("./routeCallbacks");
+const {
+  getAllSeats,
+  getAllReservations,
+  getAllCustomers,
+  getFlightReservations,
+  getOneCustomer,
+  addCustomer,
+} = require("./routeCallbacks");
 
 router.get("/", (req, res) => {
   sendResponse(res, 200, "data respond", "this is the homepage message");
 });
 
-router.get("/api/allseats", getAllSeats);
+router.get("/api/seats/:flightnum", getAllSeats);
+router.get("/api/reservations/all", getAllReservations);
+router.get("/api/reservations/:flightnum", getFlightReservations);
+router.get("/api/customers/all", getAllCustomers);
+router.get("/api/customers/:last_name/:email", getOneCustomer);
+router.post("/api/customers", addCustomer);
 
 router.get("*", (req, res) => {
   sendResponse(
