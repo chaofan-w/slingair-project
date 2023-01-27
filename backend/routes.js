@@ -9,6 +9,7 @@ const {
   deActivateCustomers,
   changeSeatsAvailablity,
   addReservations,
+  cancelReservations,
 } = require("./routeCallbacks");
 
 router.get("/", (req, res) => {
@@ -21,6 +22,7 @@ router.get("/api/reservations/all", getAllReservations);
 router.get("/api/reservations/:flightnum", getFlightReservations);
 router.get("/api/reservations", changeSeatsAvailablity);
 router.post("/api/reservations", addReservations);
+router.patch("/api/reservations", cancelReservations);
 
 router.get("/api/customers/all", getAllCustomers);
 router.get("/api/customers/:last_name/:email", getOneCustomer);

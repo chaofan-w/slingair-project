@@ -2,6 +2,8 @@ const { MongoClient } = require("mongodb");
 require("dotenv").config();
 // first require dotenv.config(), then get MONGO_URI from process.env
 const { MONGO_URI } = process.env;
+const ObjectId = require("mongodb").ObjectId;
+
 const options = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -88,7 +90,18 @@ const getFlightReservations = async (req, res) => {
   try {
     const allReservations = await db
       .collection("reservations")
-      .find({ "order.flight": flightnum.toUpperCase() })
+      .find({
+        order: {
+          $elemMatch: {
+            flight: flightnum.toUpperCase(),
+            //https://www.thecodebuzz.com/mongodb-query-for-documents-array-size-is-greater-than-mongoshell-cli-node-js/ MongoDB Query for documents array size is greater than
+            // seat: { $type: "array", $ne: [] },
+
+            // return all the records where the array size is greater than or equal to 1
+            "seat.0": { $exists: true },
+          },
+        },
+      })
       .toArray();
     client.close();
     console.log("disconnected");
@@ -248,7 +261,7 @@ const changeSeatsAvailablity = async (req, res) => {
 
     const allReservations = await db
       .collection("reservations")
-      .find({ "order.flight": flightNum })
+      .find({ order: { $elemMatch: { flight: flightNum } } })
       .collation({ locale: "en", strength: 1 })
       .toArray();
     client.close();
@@ -310,6 +323,38 @@ const addReservations = async (req, res) => {
   }
 };
 
+const cancelReservations = async (req, res) => {
+  const { flight, seat, orderId } = req.body;
+  await client.connect();
+  console.log("connected");
+  try {
+    const updateResult = await db.collection("reservations").updateOne(
+      {
+        _id: ObjectId(orderId),
+        order: { $elemMatch: { flight: flight } },
+      },
+      {
+        $pull: {
+          "order.$[].seat": seat,
+        },
+      }
+    );
+    if (updateResult.modifiedCount > 0) {
+      console.log(updateResult.modifiedCount);
+      sendResponse(res, 200, null, "reservation cancelled");
+      client.close();
+      console.log("disconnected");
+      return;
+    } else {
+      sendResponse(res, 404, null, "no matched seat found");
+      client.close();
+      console.log("disconnected");
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 // ----------https://www.prisma.io/dataguide/mongodb/managing-documents----------
 
 //-------- send response function for each call back--------------------------
@@ -333,4 +378,5 @@ module.exports = {
   deActivateCustomers,
   changeSeatsAvailablity,
   addReservations,
+  cancelReservations,
 };
