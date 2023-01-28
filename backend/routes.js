@@ -6,7 +6,7 @@ const {
   getFlightReservations,
   getOneCustomer,
   addCustomer,
-  deActivateCustomers,
+  changeCustomersActiveStatus,
   changeSeatsAvailablity,
   addReservations,
   cancelReservations,
@@ -27,7 +27,7 @@ router.patch("/api/reservations", cancelReservations);
 router.get("/api/customers/all", getAllCustomers);
 router.get("/api/customers/:last_name/:email", getOneCustomer);
 router.post("/api/customers", addCustomer);
-router.patch("/api/customers", deActivateCustomers);
+router.patch("/api/customers", changeCustomersActiveStatus);
 
 router.get("*", (req, res) => {
   sendResponse(

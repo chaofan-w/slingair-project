@@ -23,16 +23,24 @@ const getAllSeats = async (req, res) => {
     const seats = await db.collection(collectionName).find().toArray();
     client.close();
     console.log("disconnected");
-
-    sendResponse(
-      res,
-      200,
-      {
-        flightNum: collectionName,
-        seats: seats,
-      },
-      ""
-    );
+    if (seats.length > 0) {
+      sendResponse(
+        res,
+        200,
+        {
+          flightNum: collectionName,
+          seats: seats,
+        },
+        ""
+      );
+    } else {
+      sendResponse(
+        res,
+        400,
+        null,
+        `no seat data found of the given flight number: ${flightnum.toUpperCase()}`
+      );
+    }
   } catch (err) {
     console.log(err);
   }
@@ -46,15 +54,15 @@ const getAllReservations = async (req, res) => {
       .collection("reservations")
       .find()
       .toArray();
+    client.close();
+    console.log("disconnected");
     if (allReservations.length > 0) {
       sendResponse(res, 200, allReservations, "");
-      client.close();
-      console.log("disconnected");
       return;
     } else {
       sendResponse(res, 404, null, "no reservation in database so far.");
-      client.close();
-      console.log("disconnected");
+      // client.close();
+      // console.log("disconnected");
       return;
     }
   } catch (err) {
@@ -66,15 +74,15 @@ const getAllCustomers = async (req, res) => {
   console.log("connected");
   try {
     const allCustomers = await db.collection("customers").find().toArray();
+    client.close();
+    console.log("disconnected");
     if (allCustomers.length > 0) {
       sendResponse(res, 200, allCustomers, "");
-      client.close();
-      console.log("disconnected");
       return;
     } else {
       sendResponse(res, 404, null, "no customers in database so far.");
-      client.close();
-      console.log("disconnected");
+      // client.close();
+      // console.log("disconnected");
       return;
     }
   } catch (err) {
@@ -203,20 +211,27 @@ const addCustomer = async (req, res) => {
         null,
         "email already registered, please use another email."
       );
+      client.close();
+      console.log("disconnected");
+      return;
     } else {
       await db.collection("customers").insertOne({
         first_name: first_name,
         last_name: last_name,
         email: email,
+        activated: true,
       });
       sendResponse(res, 200, null, "account registered successfully");
+      client.close();
+      console.log("disconnected");
+      return;
     }
   } catch (err) {
     console.log(err);
   }
 };
 
-const deActivateCustomers = async (req, res) => {
+const changeCustomersActiveStatus = async (req, res) => {
   await client.connect();
   console.log("connected");
   const emailArr = req.body;
@@ -224,22 +239,27 @@ const deActivateCustomers = async (req, res) => {
   try {
     const updatedCustomers = await db
       .collection("customers")
-      .updateMany(
-        { email: { $in: emailArr }, activated: true },
-        { $set: { activated: false } }
-      );
+      // to toggle a boolean value of a field, maksure with a [] to wrap the $set operator line,
+      // https://www.appsloveworld.com/mongodb/100/31/toggle-a-boolean-value-with-mongodb
+      .updateMany({ email: { $in: emailArr } }, [
+        { $set: { activated: { $eq: [false, "$activated"] } } },
+      ]);
+    // .updateMany({ email: { $in: emailArr } }, [
+    //   { $set: { activated: { $not: "$activated" } } },
+    // ]);
     client.close();
     console.log("disconnected");
     if (updatedCustomers.modifiedCount > 0) {
+      console.log(updatedCustomers.modifiedCount);
       sendResponse(
         res,
         200,
         null,
-        `${updatedCustomers.modifiedCount} accounts have been deactivated`
+        `${updatedCustomers.modifiedCount} accounts active status changed`
       );
       return;
     } else {
-      sendResponse(res, 404, null, "the accounts are already deactivated");
+      sendResponse(res, 404, null, "no applicable accounts found");
       return;
     }
   } catch (err) {
@@ -304,20 +324,15 @@ const changeSeatsAvailablity = async (req, res) => {
 const addReservations = async (req, res) => {
   await client.connect();
   console.log("connected");
-  const {
-    email,
-    order: [{ flight, seat }],
-  } = req.body;
-  console.log(flight);
-  console.log(seat);
+  const { email, order } = req.body;
   try {
-    const newReservations = await db.collection("reservations").insertOne({
+    await db.collection("reservations").insertOne({
       email: email,
-      order: [{ flight: flight, seat: seat }],
+      order: order,
     });
     client.close();
     console.log("disconnected");
-    sendResponse(res, 200, null, "tickets booked successfully");
+    sendResponse(res, 200, order, "tickets booked successfully");
   } catch (err) {
     console.log(err);
   }
@@ -327,6 +342,51 @@ const cancelReservations = async (req, res) => {
   const { flight, seat, orderId } = req.body;
   await client.connect();
   console.log("connected");
+
+  if (flight === "all") {
+    try {
+      await db.collection("reservations").deleteOne({ _id: ObjectId(orderId) });
+      sendResponse(res, 200, null, `Your order:${orderId} has been cancelled`);
+      client.close();
+      console.log("disconnected");
+      return;
+    } catch (err) {
+      console.log(err);
+      client.close();
+      console.log("disconnected");
+      return;
+    }
+  }
+
+  if (seat === "all") {
+    try {
+      await db.collection("reservations").updateOne(
+        {
+          _id: ObjectId(orderId),
+        },
+        {
+          $pull: {
+            order: { flight: flight },
+          },
+        }
+      );
+      sendResponse(
+        res,
+        200,
+        null,
+        `Your have successfully cancelled all seats on flight-${flight} in order: ${orderId}`
+      );
+      client.close();
+      console.log("disconnected");
+      return;
+    } catch (err) {
+      console.log(err);
+      client.close();
+      console.log("disconnected");
+      return;
+    }
+  }
+
   try {
     const updateResult = await db.collection("reservations").updateOne(
       {
@@ -334,14 +394,21 @@ const cancelReservations = async (req, res) => {
         order: { $elemMatch: { flight: flight } },
       },
       {
-        $pull: {
+        $pullAll: {
           "order.$[].seat": seat,
         },
       }
     );
     if (updateResult.modifiedCount > 0) {
       console.log(updateResult.modifiedCount);
-      sendResponse(res, 200, null, "reservation cancelled");
+      sendResponse(
+        res,
+        200,
+        null,
+        `You have successfully cancelled seat: ${seat.join(
+          ","
+        )} of flight-${flight}`
+      );
       client.close();
       console.log("disconnected");
       return;
@@ -375,7 +442,7 @@ module.exports = {
   getFlightReservations,
   getOneCustomer,
   addCustomer,
-  deActivateCustomers,
+  changeCustomersActiveStatus,
   changeSeatsAvailablity,
   addReservations,
   cancelReservations,
