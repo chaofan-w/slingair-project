@@ -20,7 +20,11 @@ const getAllSeats = async (req, res) => {
   await client.connect();
   console.log("connected");
   try {
-    const seats = await db.collection(collectionName).find().toArray();
+    const seats = await db
+      .collection(collectionName)
+      .find()
+      .sort({ _id: 1 })
+      .toArray();
     client.close();
     console.log("disconnected");
     if (seats.length > 0) {
