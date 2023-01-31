@@ -96,6 +96,15 @@ const Seats = () => {
               disabled={seat.isAvailable ? false : true}
               onClick={handleToggleSeats}
               value={seat._id}
+              sx={{
+                color: reservationState.carts.find(
+                  (order) =>
+                    order.flight === flightnum &&
+                    order.seatArr.includes(seat._id)
+                )
+                  ? "red"
+                  : (theme) => theme.palette.primary.main,
+              }}
             >
               <Typography>{seat._id}</Typography>
               {" --- "}
