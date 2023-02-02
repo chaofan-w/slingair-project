@@ -33,16 +33,16 @@ const Seats = () => {
     let flightInCarts = currCarts.find((order) => order.flight === flightnum);
     console.log(flightInCarts);
     if (!flightInCarts) {
-      currCarts.push({ flight: flightnum, seatArr: [seatId] });
+      currCarts.push({ flight: flightnum, seat: [seatId] });
     } else {
       console.log(flightInCarts);
       currCarts = currCarts.map((order) => {
         if (order.flight === flightnum) {
-          if (order.seatArr.includes(seatId)) {
-            const updateseat = order.seatArr.filter((i) => i !== seatId);
-            return { ...order, seatArr: updateseat };
+          if (order.seat.includes(seatId)) {
+            const updateseat = order.seat.filter((i) => i !== seatId);
+            return { ...order, seat: updateseat };
           } else {
-            order.seatArr.push(seatId);
+            order.seat.push(seatId);
             return order;
           }
         } else {
@@ -99,8 +99,7 @@ const Seats = () => {
               sx={{
                 color: reservationState.carts.find(
                   (order) =>
-                    order.flight === flightnum &&
-                    order.seatArr.includes(seat._id)
+                    order.flight === flightnum && order.seat.includes(seat._id)
                 )
                   ? "red"
                   : (theme) => theme.palette.primary.main,

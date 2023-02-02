@@ -14,10 +14,15 @@ import {
   Icon,
 } from "@mui/material";
 import ReservationContext from "../ReservationContext";
+import { HighlightOffOutlined } from "@mui/icons-material";
 
 const LoginPage = () => {
-  const { reservationState, reservationDispatch } =
-    React.useContext(ReservationContext);
+  const {
+    reservationState,
+    reservationDispatch,
+    setDisplaySignIn,
+    setLoginStatus,
+  } = React.useContext(ReservationContext);
   const [email, setEmail] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const handleSubmit = (e) => {
@@ -28,16 +33,18 @@ const LoginPage = () => {
         if (data.status === 200) {
           reservationDispatch({
             type: "get_profile",
+            loginStatus: true,
             error: "",
+            lastName: lastName,
             loginEmail: email,
             carts: reservationState.carts,
             reservations: data.data.reservations,
             message: "",
           });
+          setDisplaySignIn(false);
         }
       });
   };
-  console.log(reservationState);
   return (
     <Box
       //px for classes that set both padding-left and padding-right
@@ -57,6 +64,25 @@ const LoginPage = () => {
         backdropFilter: "blur(5px)",
       }}
     >
+      <IconButton
+        sx={{
+          width: 10,
+          height: 10,
+          position: "absolute",
+          top: 10,
+          right: 10,
+          color: "secondary.focus",
+        }}
+        onClick={() => {
+          setLastName("");
+          setEmail("");
+          setDisplaySignIn(false);
+        }}
+      >
+        <Icon>
+          <HighlightOffOutlined />
+        </Icon>
+      </IconButton>
       <Box pt={2} pb={3} px={3}>
         <Box component="form" role="form" onSubmit={handleSubmit} noValidate>
           <Box mb={2}>

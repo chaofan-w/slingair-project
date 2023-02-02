@@ -20,6 +20,39 @@ const getAllSeats = async (req, res) => {
   await client.connect();
   console.log("connected");
   try {
+    const allReservations = await db
+      .collection("reservations")
+      .find({ order: { $elemMatch: { flight: flightnum } } })
+      .collation({ locale: "en", strength: 1 })
+      .toArray();
+    // console.log(allReservations);
+    if (allReservations.length > 0) {
+      const reservedSeats = allReservations.reduce((pre, curr) => {
+        return [
+          ...pre,
+          ...curr.order.find((f) => f.flight.toLowerCase() === flightnum).seat,
+        ];
+      }, []);
+      console.log(reservedSeats);
+
+      await db.collection(`${flightnum.toUpperCase()}`).updateMany(
+        { _id: { $in: reservedSeats } },
+        {
+          $set: {
+            isAvailable: false,
+          },
+        }
+      );
+      await db.collection(`${flightnum.toUpperCase()}`).updateMany(
+        { _id: { $nin: reservedSeats } },
+        {
+          $set: {
+            isAvailable: true,
+          },
+        }
+      );
+    }
+
     const seats = await db
       .collection(collectionName)
       .find()
@@ -288,13 +321,12 @@ const changeSeatsAvailablity = async (req, res) => {
       .find({ order: { $elemMatch: { flight: flightNum } } })
       .collation({ locale: "en", strength: 1 })
       .toArray();
-    client.close();
-    console.log("disconnected");
+    // console.log(allReservations);
     if (allReservations.length > 0) {
       const reservedSeats = allReservations.reduce((pre, curr) => {
         return [
           ...pre,
-          ...curr.order.find((f) => f.flight === flightNum.toUpperCase()).seat,
+          ...curr.order.find((f) => f.flight.toLowerCase() === flightNum).seat,
         ];
       }, []);
       console.log(reservedSeats);
@@ -317,6 +349,8 @@ const changeSeatsAvailablity = async (req, res) => {
       );
 
       sendResponse(res, 200, reservedSeats, "");
+      // client.close();
+      // console.log("disconnected");
     } else {
       sendResponse(res, 404, null, "no reservation in database so far.");
     }

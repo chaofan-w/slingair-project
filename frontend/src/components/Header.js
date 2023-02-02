@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import {
   Box,
   Paper,
@@ -9,12 +9,21 @@ import {
   Snackbar,
   Stack,
   IconButton,
+  Icon,
 } from "@mui/material";
 import { ShoppingCart } from "@mui/icons-material";
 import ReservationContext from "../ReservationContext";
+import { SupervisedUserCircle, Login } from "@mui/icons-material";
+import { Link, useNavigate } from "react-router-dom";
 const Header = () => {
-  const { reservationState, reservationDispatch } =
-    React.useContext(ReservationContext);
+  const navigate = useNavigate();
+  const {
+    reservationState,
+    reservationDispatch,
+    displayCheckout,
+    setDisplayCheckout,
+    setDisplaySignIn,
+  } = React.useContext(ReservationContext);
 
   return (
     <Stack
@@ -36,7 +45,15 @@ const Header = () => {
         Home
       </Button>
       <Box display="block" position="relative">
-        <IconButton>
+        <IconButton
+          disabled={
+            reservationState.carts.reduce(
+              (accumulator, curr) => accumulator + curr.seat.length,
+              0
+            ) === 0
+          }
+          onClick={() => setDisplayCheckout(!displayCheckout)}
+        >
           <ShoppingCart />
         </IconButton>
         <Typography
@@ -55,17 +72,66 @@ const Header = () => {
           }}
         >
           {/* 
-           useing the reduce, the accumulated/prev value should be set as the value itself, not the as an element. here prev is the accumulation of all seatArr length, it starts with 0, initial value is 0. from initial value one, the reduce will accumulate the value by 0 + first obj.seatArr.length; then plus 2nd obj.seatArr.length
+           useing the reduce, the accumulated/prev value should be set as the value itself, not the as an element. here prev is the accumulation of all seatA length, it starts with 0, initial value is 0. from initial value one, the reduce will accumulate the value by 0 + first obj.seat.length; then plus 2nd obj.seat.length
            if the element itself is the value, then use pre, curr e.g., (pre, curr)=>pre+curr
-           if need futher action to get the value from element, use accumulator, currentValue, e.g., (accumulator, currentValue)=> [...accumulator, ...currentValue.seatArr],[]
+           if need futher action to get the value from element, use accumulator, currentValue, e.g., (accumulator, currentValue)=> [...accumulator, ...currentValue.seat],[]
           
           */}
           {reservationState.carts.reduce(
-            (accumulator, curr) => accumulator + curr.seatArr.length,
+            (accumulator, curr) => accumulator + curr.seat.length,
             0
           )}
         </Typography>
       </Box>
+      {reservationState.loginStatus ? (
+        <Button
+          id="logoutBtn"
+          variant="text"
+          onClick={async (e) => {
+            e.preventDefault();
+            await reservationDispatch({
+              type: "get_profile",
+              loginStatus: false,
+              error: "",
+              lastName: "",
+              loginEmail: "",
+              carts: [],
+              reservations: [],
+              message: "",
+            });
+
+            // window.localStorage.setItem(
+            //   "reservationState",
+            //   JSON.stringify({
+            //     loginStatus: false,
+            //     error: "",
+            //     lastName: "",
+            //     loginEmail: "",
+            //     carts: [],
+            //     reservations: [],
+            //     message: "",
+            //   })
+            // );
+            await setDisplaySignIn(false);
+            navigate("/");
+          }}
+        >
+          Logout
+        </Button>
+      ) : (
+        <IconButton
+          onClick={() => {
+            setDisplaySignIn(true);
+          }}
+        >
+          <Typography variant="h6" sx={{ mr: 2, color: "primary.main" }}>
+            Login
+          </Typography>
+          <Icon>
+            <Login sx={{ color: "primary.main" }} />
+          </Icon>
+        </IconButton>
+      )}
     </Stack>
   );
 };
