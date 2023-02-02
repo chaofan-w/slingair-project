@@ -6,8 +6,10 @@ import Header from "./components/Header";
 import Seats from "./components/Seats";
 import ProfilePage from "./components/ProfilePage";
 import LoginPage from "./components/loginPage";
-import OrdersReview from "./components/OrdersReview";
+import OrdersReview from "./components/CartPage";
 import ReservationContext from "./ReservationContext";
+import ReservationPage from "./components/ReservationPage";
+import CartPage from "./components/CartPage";
 
 function App() {
   const { displayCheckout, displaySignIn, reservationState, loginStatus } =
@@ -25,6 +27,11 @@ function App() {
           </Route>
           <Route path="customers">
             <Route path=":last_name/:email" element={<ProfilePage />} />
+            <Route
+              path="reservations/:last_name/:email"
+              element={<ReservationPage />}
+            />
+            <Route path="carts/:last_name/:email" element={<CartPage />} />
           </Route>
         </Routes>
         {displayCheckout && <OrdersReview />}
