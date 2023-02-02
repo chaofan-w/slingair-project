@@ -13,7 +13,6 @@ import ReservationContext from "../ReservationContext";
 const Home = () => {
   const { reservationState, reservationDispatch } =
     React.useContext(ReservationContext);
-  console.log(reservationState);
   return (
     <Box sx={{ my: 5 }}>
       <Stack direction="row" spacing={3}>

@@ -20,7 +20,7 @@ router.get("/api/seats/:flightnum", getAllSeats);
 
 router.get("/api/reservations/all", getAllReservations);
 router.get("/api/reservations/:flightnum", getFlightReservations);
-router.get("/api/reservations", changeSeatsAvailablity);
+router.patch("/api/seats", changeSeatsAvailablity);
 router.post("/api/reservations", addReservations);
 router.patch("/api/reservations", cancelReservations);
 

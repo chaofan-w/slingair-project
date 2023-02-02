@@ -19,9 +19,12 @@ import {
   ListSubheader,
   ListItemButton,
 } from "@mui/material";
+import ReservationContext from "../ReservationContext";
 const ProfilePage = () => {
   const { last_name, email } = useParams();
   const [loginUser, setLoginUser] = React.useState(null);
+  const { reservationState, reservationDispatch } =
+    React.useContext(ReservationContext);
 
   React.useEffect(() => {
     let ignore = false;
@@ -32,6 +35,16 @@ const ProfilePage = () => {
           if (data.status === 200) {
             console.log(data.data);
             setLoginUser(data.data);
+            reservationDispatch({
+              type: "get_profile",
+              loginStatus: true,
+              error: "",
+              lastName: last_name,
+              loginEmail: email,
+              carts: reservationState.carts,
+              reservations: data.data.reservations,
+              message: "",
+            });
           }
         });
     }

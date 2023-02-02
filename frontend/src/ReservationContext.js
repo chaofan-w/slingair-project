@@ -4,10 +4,14 @@ const ReservationContext = React.createContext(null);
 export default ReservationContext;
 
 export const ReservationContextProvider = ({ children }) => {
+  const [displayCheckout, setDisplayCheckout] = React.useState(false);
+  // const [loginStatus, setLoginStatus] = React.useState(false);
   const initialState = JSON.parse(
     window.localStorage.getItem("reservationState")
   ) || {
+    loginStatus: false,
     error: "",
+    lastName: "",
     loginEmail: "",
     carts: [],
     reservations: [],
@@ -30,7 +34,9 @@ export const ReservationContextProvider = ({ children }) => {
     switch (action.type) {
       case "get_profile": {
         return {
+          loginStatus: action.loginStatus,
           error: action.error,
+          lastName: action.lastName,
           loginEmail: action.loginEmail,
           carts: action.carts,
           reservations: action.reservations,
@@ -39,7 +45,9 @@ export const ReservationContextProvider = ({ children }) => {
       }
       case "select_seats": {
         return {
+          loginStatus: reservationState.loginStatus,
           error: action.error,
+          lastName: reservationState.lastName,
           loginEmail: reservationState.loginEmail,
           carts: action.carts,
           reservations: reservationState.reservations,
@@ -48,11 +56,19 @@ export const ReservationContextProvider = ({ children }) => {
       }
       case "get_state_from_localstorage": {
         return {
+          loginStatus: action.loginStatus,
           error: action.error,
+          lastName: action.lastName,
           loginEmail: action.loginEmail,
           carts: action.carts,
           reservations: action.reservations,
           message: action.message,
+        };
+      }
+      case "logout": {
+        return {
+          ...reservationState,
+          loginStatus: false,
         };
       }
       default: {
@@ -85,6 +101,8 @@ export const ReservationContextProvider = ({ children }) => {
         setDisplaySignUp,
         setDisplaySignIn,
         displaySignIn,
+        displayCheckout,
+        setDisplayCheckout,
       }}
     >
       {children}
