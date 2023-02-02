@@ -19,7 +19,9 @@ import {
   ListSubheader,
   ListItemButton,
 } from "@mui/material";
+import { Logout, Settings } from "@mui/icons-material";
 import ReservationContext from "../ReservationContext";
+
 const ProfilePage = () => {
   const { last_name, email } = useParams();
   const [loginUser, setLoginUser] = React.useState(null);
