@@ -191,7 +191,7 @@ const Header = () => {
         anchorEl={anchorEl}
         id="account-menu"
         open={open}
-        onclose={handleClose}
+        onClose={handleClose}
         onClick={handleClose}
         PaperProps={{
           elevation: 0,

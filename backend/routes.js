@@ -10,6 +10,7 @@ const {
   changeSeatsAvailablity,
   addReservations,
   cancelReservations,
+  deleteReservations,
 } = require("./routeCallbacks");
 
 router.get("/", (req, res) => {
@@ -23,6 +24,7 @@ router.get("/api/reservations/:flightnum", getFlightReservations);
 router.patch("/api/seats", changeSeatsAvailablity);
 router.post("/api/reservations", addReservations);
 router.patch("/api/reservations", cancelReservations);
+router.delete("/api/reservations", deleteReservations);
 
 router.get("/api/customers/all", getAllCustomers);
 router.get("/api/customers/:last_name/:email", getOneCustomer);
