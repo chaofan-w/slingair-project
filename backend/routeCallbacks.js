@@ -460,6 +460,21 @@ const cancelReservations = async (req, res) => {
   }
 };
 
+const deleteReservations = async (req, res) => {
+  await client.connect();
+  console.log("connected");
+  try {
+    await db.collection("reservations").deleteMany({
+      order: [],
+    });
+    sendResponse(res, 200, null, 'delete done')
+    client.close();
+    console.log("disconnected");
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 // ----------https://www.prisma.io/dataguide/mongodb/managing-documents----------
 
 //-------- send response function for each call back--------------------------
@@ -484,4 +499,5 @@ module.exports = {
   changeSeatsAvailablity,
   addReservations,
   cancelReservations,
+  deleteReservations,
 };
