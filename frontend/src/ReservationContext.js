@@ -87,7 +87,7 @@ export const ReservationContextProvider = ({ children }) => {
       "reservationState",
       JSON.stringify(reservationState)
     );
-    console.log("localStorage updated");
+    // console.log("localStorage updated");
   }, [reservationState]);
 
   return (
