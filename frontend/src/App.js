@@ -10,12 +10,15 @@ import OrdersReview from "./components/CartPage";
 import ReservationContext from "./ReservationContext";
 import ReservationPage from "./components/ReservationPage";
 import CartPage from "./components/CartPage";
+import SeatsFloorMap from "./components/SeatsFloorMap";
+import GlobalStyles from "./GlobalStyles";
 
 function App() {
   const { displayCheckout, displaySignIn, reservationState, loginStatus } =
     React.useContext(ReservationContext);
   return (
     <Router>
+      <GlobalStyles />
       <Box>
         <Header />
       </Box>
@@ -23,7 +26,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="seats">
-            <Route path=":flightnum" element={<Seats />} />
+            <Route path=":flightnum" element={<SeatsFloorMap />} />
+            {/* <Route path=":flightnum" element={<Seats />} /> */}
           </Route>
           <Route path="customers">
             <Route path=":last_name/:email" element={<ProfilePage />} />
