@@ -54,7 +54,7 @@ const Seats = () => {
     return reservationDispatch({
       type: "select_seats",
       error: "",
-      carts: currCarts,
+      carts: currCarts.filter((order) => order.seat.length > 0),
       message: "",
     });
   };
