@@ -21,6 +21,7 @@ import {
   IconButton,
   Grid,
   ButtonBase,
+  Tooltip,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import ReservationContext from "../ReservationContext";
@@ -36,11 +37,11 @@ const SeatsFloorMap = () => {
     const seatId = e.currentTarget.value;
     let currCarts = reservationState.carts;
     let flightInCarts = currCarts.find((order) => order.flight === flightnum);
-    console.log(flightInCarts);
+    // console.log(flightInCarts);
     if (!flightInCarts) {
       currCarts.push({ flight: flightnum, seat: [seatId] });
     } else {
-      console.log(flightInCarts);
+      // console.log(flightInCarts);
       currCarts = currCarts.map((order) => {
         if (order.flight === flightnum) {
           if (order.seat.includes(seatId)) {
@@ -59,12 +60,12 @@ const SeatsFloorMap = () => {
     return reservationDispatch({
       type: "select_seats",
       error: "",
-      carts: currCarts,
+      carts: currCarts.filter((order) => order.seat.length > 0),
       message: "",
     });
   };
 
-  // console.log(reservationState);
+  console.log(reservationState);
 
   React.useEffect(() => {
     let ignore = false;
@@ -101,76 +102,166 @@ const SeatsFloorMap = () => {
     color: theme.palette.text.secondary,
   }));
 
+  const rows = Array.from({ length: 10 }, (value, index) => index + 1);
+
   return (
-    <Box width={"100%"} height={"100%"} minWidth={360}>
+    <Box
+      sx={{
+        width: "100%",
+        minWidth: 360,
+      }}
+    >
       <Paper
-        elevation={1}
+        elevation={0}
+        variant={"outlined"}
+        component={"div"}
         sx={{
           width: "100%",
-          height: "100%",
-          minHeight: 480,
+          height: "92vh",
+          overflow: "auto",
+          // minHeight: 480,
+          bgcolor: (theme) => theme.palette.secondary.light,
         }}
       >
-        <Grid
-          container
-          width={{ xs: 360, sm: 480, md: 720 }}
+        <Stack
+          width={{ xs: 460, sm: 580, md: 820 }}
+          direction={"row"}
+          alignItems={"flex-start"}
+          justifyContent={"flex-start"}
           sx={{
-            // border: "2px solid black",
-            rowGap: { xs: 1, sm: 2, md: 4 },
-            columnGap: 1,
             mx: "auto",
+            gap: 2,
+            // border: "1px solid red",
           }}
         >
-          {seats &&
-            seats.map((seat, index) => (
-              <Grid
-                xs={1.6}
-                height={{ xs: 50, sm: 60, md: 70 }}
-                sx={{
-                  // border: "1px solid red",
-                  position: "relative",
-                  ml: () => (index % 6 === 3 ? { xs: 3, sm: 4, md: 5 } : 0),
-                }}
-              >
-                <Item
+          <Grid
+            container
+            width={100}
+            sx={{
+              rowGap: { xs: 1, sm: 1.5, md: 4 },
+              columnGap: 1,
+              mx: "auto",
+              my: 2,
+              // border: "1px solid red",
+            }}
+          >
+            {rows &&
+              rows.map((row, index) => (
+                <Grid
+                  key={"row-" + row}
+                  item={true}
+                  xs={12}
+                  height={{ xs: 40, sm: 60, md: 70 }}
+                >
+                  <Typography
+                    variant="body2"
+                    fontWeight={"medium"}
+                    sx={{
+                      width: "100%",
+                      textAlign: "right",
+                    }}
+                  >
+                    {"Row - " + row}
+                  </Typography>
+                </Grid>
+              ))}
+          </Grid>
+          <Grid
+            container
+            width={{ xs: 360, sm: 480, md: 720 }}
+            sx={{
+              rowGap: { xs: 1, sm: 1.5, md: 4 },
+              // border: "1px solid red",
+              columnGap: 1,
+              mx: "auto",
+              my: 2,
+            }}
+          >
+            {seats &&
+              seats.map((seat, index) => (
+                <Grid
+                  item={true}
+                  xs={1.6}
+                  height={{ xs: 40, sm: 60, md: 70 }}
+                  key={`${flightnum}-${seat._id}`}
                   sx={{
                     // border: "1px solid red",
                     position: "relative",
-                    p: { xs: 0, sm: 1, md: 2 },
+                    ml: () => (index % 6 === 3 ? { xs: 3, sm: 4, md: 5 } : 0),
                   }}
                 >
-                  <ButtonBase
-                    height={{ xs: 40, sm: 50, md: 60 }}
-                    width={{ xs: 40, sm: 50, md: 60 }}
+                  <Item
                     sx={{
-                      p: 0,
-                      // border: "1px solid yellow",
+                      // border: "1px solid red",
+                      position: "relative",
+                      p: { xs: 0, sm: 1, md: 2 },
                     }}
                   >
-                    <Typography
-                      variant="caption"
+                    <ButtonBase
+                      height={{ xs: 40, sm: 50, md: 60 }}
+                      width={{ xs: 40, sm: 50, md: 60 }}
+                      // key={`${flightnum}-${seat._id}`}
+                      disabled={seat.isAvailable ? false : true}
+                      onClick={(e) => {
+                        reservationState.loginStatus && handleToggleSeats(e);
+                      }}
+                      value={seat._id}
                       sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%,-50%)",
-                        zIndex: 10,
+                        p: 0,
+                        // border: "1px solid yellow",
                       }}
                     >
-                      {seat._id}
-                    </Typography>
-                    <Chair
-                      sx={{
-                        width: { xs: 40, sm: 50, md: 60 },
-                        height: { xs: 40, sm: 50, md: 60 },
-                        color: (theme) => theme.palette.primary.dark,
-                      }}
-                    />
-                  </ButtonBase>
-                </Item>
-              </Grid>
-            ))}
-        </Grid>
+                      <Typography
+                        variant="body2"
+                        fontWeight={"medium"}
+                        sx={{
+                          width: { xs: 40, sm: 50, md: 60 },
+                          position: "absolute",
+                          top: "30%",
+                          left: "50%",
+                          transform: "translate(-50%,-50%)",
+                          zIndex: 10,
+                          color: (theme) =>
+                            reservationState.carts.find(
+                              (order) =>
+                                order.flight === flightnum &&
+                                order.seat.includes(seat._id)
+                            )
+                              ? theme.palette.common.white
+                              : theme.palette.primary.contrastText,
+                        }}
+                      >
+                        {seat._id}
+                      </Typography>
+                      <Chair
+                        sx={{
+                          width: { xs: 40, sm: 50, md: 60 },
+                          height: { xs: 40, sm: 50, md: 60 },
+                          color: (theme) => {
+                            if (
+                              reservationState.carts.find(
+                                (order) =>
+                                  order.flight === flightnum &&
+                                  order.seat.includes(seat._id)
+                              )
+                            ) {
+                              return theme.palette.primary.select;
+                            } else {
+                              if (seat.isAvailable) {
+                                return theme.palette.primary.dark;
+                              } else {
+                                return theme.palette.grey[400];
+                              }
+                            }
+                          },
+                        }}
+                      />
+                    </ButtonBase>
+                  </Item>
+                </Grid>
+              ))}
+          </Grid>
+        </Stack>
       </Paper>
       {/* <List>
         <ListSubheader>{"Flight: " + flightnum.toUpperCase()}</ListSubheader>

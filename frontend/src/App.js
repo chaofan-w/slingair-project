@@ -19,28 +19,24 @@ function App() {
   return (
     <Router>
       <GlobalStyles />
-      <Box>
-        <Header />
-      </Box>
-      <Box>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="seats">
-            <Route path=":flightnum" element={<SeatsFloorMap />} />
-            {/* <Route path=":flightnum" element={<Seats />} /> */}
-          </Route>
-          <Route path="customers">
-            <Route path=":last_name/:email" element={<ProfilePage />} />
-            <Route
-              path="reservations/:last_name/:email"
-              element={<ReservationPage />}
-            />
-            <Route path="carts/:last_name/:email" element={<CartPage />} />
-          </Route>
-        </Routes>
-        {displayCheckout && <OrdersReview />}
-        {!loginStatus && displaySignIn && <LoginPage />}
-      </Box>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="seats">
+          <Route path=":flightnum" element={<SeatsFloorMap />} />
+          {/* <Route path=":flightnum" element={<Seats />} /> */}
+        </Route>
+        <Route path="customers">
+          <Route path=":last_name/:email" element={<ProfilePage />} />
+          <Route
+            path="reservations/:last_name/:email"
+            element={<ReservationPage />}
+          />
+          <Route path="carts/:last_name/:email" element={<CartPage />} />
+        </Route>
+      </Routes>
+      {displayCheckout && <OrdersReview />}
+      {!loginStatus && displaySignIn && <LoginPage />}
     </Router>
   );
 }
