@@ -32,9 +32,12 @@ import {
   Settings,
   BookOnline,
   EventSeat,
+  FlightTakeoffOutlined,
+  AirlinesOutlined,
 } from "@mui/icons-material";
-import logo from "./slignair_logo.png";
+import logo from "./logo-icon.png";
 const Header = () => {
+  const flightNums = ["SA231", "SA232", "SA233"];
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (e) => {
@@ -42,6 +45,14 @@ const Header = () => {
   };
   const handleClose = () => {
     setAnchorEl(null);
+  };
+  const [anchorFlightEl, setAnchorFlightEl] = React.useState(null);
+  const openFlight = Boolean(anchorFlightEl);
+  const handleClickFlight = (e) => {
+    setAnchorFlightEl(e.currentTarget);
+  };
+  const handleCloseFlight = () => {
+    setAnchorFlightEl(null);
   };
   const navigate = useNavigate();
   const {
@@ -55,7 +66,7 @@ const Header = () => {
   const avatarNameAbbre = (lastName) => {
     return {
       sx: {
-        bgcolor: (theme) => theme.palette.primary.main,
+        bgcolor: "primary.main",
       },
       alt: lastName,
       children: `${lastName[0]}`,
@@ -86,10 +97,96 @@ const Header = () => {
           direction="row"
           alignItems="center"
           justifyContent="space-between"
-          sx={{ width: "100%", pr: 5 }}
+          sx={{ width: "100%", px: 2 }}
         >
+          <IconButton
+            onClick={handleClickFlight}
+            sx={{
+              color: "common.black",
+              width: 80,
+              height: 40,
+              borderRadius: 0,
+            }}
+          >
+            <FlightTakeoffOutlined />
+            <Typography
+              sx={{
+                ml: 1,
+                color: "common.black",
+                display: { xs: "none", sm: "block" },
+              }}
+            >
+              Flight
+            </Typography>
+          </IconButton>
+          <Menu
+            anchorEl={anchorFlightEl}
+            id="account-menu"
+            open={openFlight}
+            onClose={handleCloseFlight}
+            onClick={handleCloseFlight}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                width: 100,
+                overflow: "visible",
+                filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                mt: 1.5,
+                "& .MuiAvatar-root": {
+                  width: 32,
+                  height: 32,
+                  ml: -0.5,
+                  mr: 1,
+                },
+                //small triangle arrow on top of popup menu
+                "&:before": {
+                  content: '""',
+                  display: "block",
+                  position: "absolute",
+                  top: 0,
+                  left: "20%",
+                  width: 10,
+                  height: 10,
+                  bgcolor: "background.paper",
+                  transform: "translate(-50%, -50%) rotate(45deg)",
+                  zIndex: 0,
+                },
+              },
+            }}
+            transformOrigin={{ horizontal: "left", vertical: "top" }}
+            anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
+          >
+            {flightNums.map((flightnum) => (
+              <MenuItem key={flightnum} sx={{ p: 1 }}>
+                <IconButton
+                  variant="contained"
+                  href="/seats/sa231"
+                  sx={{
+                    color: "primary.select",
+                    width: "100%",
+                    height: 40,
+                    borderRadius: 0,
+                    p: 0,
+                    mx: "auto",
+                  }}
+                >
+                  <AirlinesOutlined />
+                  <Typography sx={{ ml: 1 }}>{flightnum}</Typography>
+                </IconButton>
+              </MenuItem>
+            ))}
+            {/* <MenuItem>
+              <Button variant="contained" href="/seats/sa232">
+                SA232
+              </Button>
+            </MenuItem>
+            <MenuItem>
+              <Button variant="contained" href="/seats/sa233">
+                SA233
+              </Button>
+            </MenuItem> */}
+          </Menu>
           <Button
-            variant="outlined"
             href="/"
             // onClick={() => {
             //   window.localStorage.setItem(
@@ -98,15 +195,27 @@ const Header = () => {
             //   );
             // }}
           >
-            <Box
-              component="img"
-              src={logo}
-              sx={{
-                width: 60,
-                height: 60,
-                zIndex: 20,
-              }}
-            />
+            <Stack direction={"row"} alignItems={"center"} spacing={1}>
+              <Box
+                component="img"
+                src={logo}
+                sx={{
+                  width: 50,
+                  height: 50,
+                  zIndex: 20,
+                }}
+              />
+              <Typography
+                variant="subtitle1"
+                fontWeight={"bold"}
+                sx={{
+                  color: "common.black",
+                  display: { xs: "none", sm: "block" },
+                }}
+              >
+                Sling Airline
+              </Typography>
+            </Stack>
           </Button>
           {reservationState.loginStatus ? (
             <Stack direction={"row"} spacing={2} alignItems={"center"}>
@@ -120,7 +229,7 @@ const Header = () => {
                   }
                   onClick={() => setDisplayCheckout(!displayCheckout)}
                 >
-                  <ShoppingCart />
+                  <ShoppingCart sx={{ color: "common.black" }} />
                 </IconButton>
                 {reservationState.carts.reduce(
                   (accumulator, curr) => accumulator + curr.seat.length,
@@ -136,9 +245,10 @@ const Header = () => {
                       position: "absolute",
                       top: 0,
                       right: 0,
-                      backgroundColor: (theme) => theme.palette.primary.main,
+                      // backgroundColor: "primary.select",
                       borderRadius: "50%",
                       color: "white",
+                      bgcolor: "primary.select",
                     }}
                   >
                     {/* 
@@ -157,12 +267,15 @@ const Header = () => {
               <IconButton
                 onClick={handleClick}
                 size="small"
-                sx={{ ml: 2 }}
+                sx={{ ml: 1, bgcolor: "primary.dark" }}
                 aria-controls={open ? "account-menu" : undefined}
                 aria-haspopup="true"
                 aria-expanded={open ? "true" : undefined}
               >
-                <Avatar {...avatarNameAbbre(reservationState.lastName)} />
+                <Avatar
+                  {...avatarNameAbbre(reservationState.lastName)}
+                  sx={{ bgcolor: "secondary.light", color: "primary.dark" }}
+                />
               </IconButton>
 
               {/* <Button
@@ -205,12 +318,25 @@ const Header = () => {
               onClick={() => {
                 setDisplaySignIn(true);
               }}
+              sx={{
+                color: "primary.select",
+                width: 80,
+                height: 40,
+                borderRadius: 0,
+              }}
             >
-              <Typography variant="h6" sx={{ mr: 2, color: "primary.main" }}>
+              <Typography
+                variant="body1"
+                sx={{
+                  mr: 1,
+                  color: "common.black",
+                  display: { xs: "none", sm: "block" },
+                }}
+              >
                 Login
               </Typography>
               <Icon>
-                <Login sx={{ color: "primary.main" }} />
+                <Login sx={{ color: "common.black" }} />
               </Icon>
             </IconButton>
           )}

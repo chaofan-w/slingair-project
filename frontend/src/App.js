@@ -35,8 +35,8 @@ function App() {
           <Route path="carts/:last_name/:email" element={<CartPage />} />
         </Route>
       </Routes>
+
       {displayCheckout && <OrdersReview />}
-      {!loginStatus && displaySignIn && <LoginPage />}
     </Router>
   );
 }

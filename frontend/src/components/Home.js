@@ -8,11 +8,16 @@ import {
   Fade,
   Snackbar,
   Stack,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import ReservationContext from "../ReservationContext";
+import LoginPage from "./loginPage";
 const Home = () => {
-  const { reservationState, reservationDispatch } =
+  const { reservationState, reservationDispatch, loginStatus, displaySignIn } =
     React.useContext(ReservationContext);
+
+  // const navigate = useNavigate();
   return (
     <Box
       sx={{
@@ -28,13 +33,15 @@ const Home = () => {
       }}
     >
       <Typography
-        variant="h6"
+        variant={"h6"}
         sx={{
+          minWidth: 300,
           color: "primary.dark",
           position: "absolute",
           top: { xs: "50%", sm: "40%" },
-          right: { xs: "20%", sm: 20 },
+          right: { xs: "50%", sm: 20 },
           fontFamily: "work sans",
+          transform: { xs: "translateX(50%)", sm: "translateX(0)" },
         }}
       >
         Home, a fly away from Home
@@ -42,17 +49,31 @@ const Home = () => {
       <Stack
         direction="row"
         spacing={3}
-        sx={{ border: "1px solid white", pt: 5 }}
+        justifyContent={"center"}
+        sx={{
+          width: "100%",
+          // border: "1px solid white",
+          position: "absolute",
+          bottom: "10%",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
       >
-        <Button variant="contained" href="/seats/sa231">
-          SA231
-        </Button>
-        <Button variant="contained" href="/seats/sa232">
-          SA232
-        </Button>
-        <Button variant="contained" href="/seats/sa233">
-          SA233
-        </Button>
+        {!loginStatus && displaySignIn && (
+          <Paper
+            elevation={1}
+            sx={{
+              minWidth: "40%",
+              background: "rgba(255, 255, 255, 0.07)",
+              borderRadius: "16px",
+              boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+              backdropFilter: "blur(11.9px)",
+              border: "1px solid rgba(255, 255, 255, 0.02)",
+            }}
+          >
+            <LoginPage />
+          </Paper>
+        )}
       </Stack>
     </Box>
   );
