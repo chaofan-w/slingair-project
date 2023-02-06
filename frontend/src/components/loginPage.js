@@ -50,15 +50,14 @@ const LoginPage = () => {
       //px for classes that set both padding-left and padding-right
       px={1}
       width="100%"
-      height="100vh"
       //mx for classes that set both margin-left and margin-right
       mx="auto"
-      position="absolute"
-      top={0}
-      left={0}
+      // position="absolute"
+      // top={0}
+      // left={0}
       zIndex={2}
       sx={{
-        background: "rgba(241, 163, 138, 0.5)",
+        background: "rgba(241, 163, 138, 0.1)",
         borderRadius: "16px",
         boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
         backdropFilter: "blur(5px)",
