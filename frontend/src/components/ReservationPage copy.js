@@ -26,7 +26,6 @@ import {
 } from "@mui/material";
 import { Logout, Settings, Comment, Delete } from "@mui/icons-material";
 import ReservationContext from "../ReservationContext";
-import ReservationCard from "./ReservationCard";
 
 const ReservationPage = () => {
   const { last_name, email } = useParams();
@@ -192,22 +191,93 @@ const ReservationPage = () => {
       {loginUser && (
         <List>
           <ListSubheader>
-            <Typography variant="h5">Reservations</Typography>
+            <Typography>Reservations</Typography>
           </ListSubheader>
           {loginUser.reservations &&
             loginUser.reservations
               .filter((item) => item.order.length > 0)
               .map((orderItem) => (
                 <ListItem key={orderItem._id}>
-                  <ReservationCard
-                    orderItem={orderItem}
-                    selectSeat={selectSeat}
-                    handleCancelReservations={handleCancelReservations}
-                    handleToggle={handleToggle}
-                    checked={checked}
-                    setChecked={setChecked}
-                    selectedSeats={selectedSeats}
-                  />
+                  <Typography>
+                    <span style={{ color: "red" }}>Order Id: </span>
+                    {orderItem._id}
+                  </Typography>
+                  {/* </Stack> */}
+                  <List>
+                    {orderItem.order &&
+                      orderItem.order.map((order, index) => (
+                        <ListItem key={`order-${index}`}>
+                          {/* {selectedSeats &&
+                          Object.keys(selectedSeats[orderItem._id]).length >
+                            0 &&
+                          (selectedSeats[orderItem._id][
+                            order.flight.toLowerCase()
+                          ] ||
+                            selectedSeats[orderItem._id][
+                              order.flight.toUpperCase()
+                            ]) && ( */}
+                          {selectedSeats &&
+                            Object.keys(selectedSeats).includes(
+                              orderItem._id
+                            ) &&
+                            Object.keys(selectedSeats[orderItem._id]).includes(
+                              order.flight
+                            ) && (
+                              <Tooltip title="delete selections">
+                                <IconButton
+                                  key={orderItem._id}
+                                  onClick={(e) => {
+                                    handleCancelReservations(e, orderItem._id);
+                                  }}
+                                  value={`${order.flight}`}
+                                >
+                                  <Delete
+                                    sx={{
+                                      color: (theme) =>
+                                        theme.palette.warning.dark,
+                                    }}
+                                  />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+
+                          <Typography>{order.flight}</Typography>
+                          {order.seat &&
+                            order.seat.map((seat) => {
+                              const value = `${order.flight}-${seat}`;
+                              const labelId = `checkbox-list-label-${value}`;
+                              return (
+                                <ListItemButton
+                                  role={undefined}
+                                  key={value}
+                                  onClick={async () => {
+                                    handleToggle(value);
+                                    await selectSeat(
+                                      order.flight,
+                                      orderItem._id,
+                                      seat
+                                    );
+                                    // checkEmptyOrder();
+                                  }}
+                                >
+                                  <ListItemIcon>
+                                    <Checkbox
+                                      edge="start"
+                                      checked={checked.indexOf(value) !== -1}
+                                      tabIndex={-1}
+                                      disableRipple
+                                      inputProps={{
+                                        "aria-labelledby": labelId,
+                                      }}
+                                    />
+                                    <ListItemText id={labelId} primary={seat} />
+                                  </ListItemIcon>
+                                </ListItemButton>
+                              );
+                            })}
+                        </ListItem>
+                      ))}
+                  </List>
                 </ListItem>
               ))}
         </List>
