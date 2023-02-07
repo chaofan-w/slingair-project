@@ -15,8 +15,10 @@ import {
 } from "@mui/material";
 import ReservationContext from "../ReservationContext";
 import { HighlightOffOutlined } from "@mui/icons-material";
+import { Link, useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
+  const naviate = useNavigate();
   const {
     reservationState,
     reservationDispatch,
@@ -114,6 +116,7 @@ const LoginPage = () => {
               fullWidth
             />
           </Box>
+
           <Box mt={4} mb={1}>
             <Button
               variant="contained"
@@ -124,6 +127,17 @@ const LoginPage = () => {
               sign in
             </Button>
           </Box>
+        </Box>
+        <Box mt={4} mb={1}>
+          <Button
+            variant="text"
+            type="button"
+            // fullWidth
+            sx={{ color: "primary.dark" }}
+            href={"/signup"}
+          >
+            NEW CLIENT JOIN
+          </Button>
         </Box>
       </Box>
     </Box>

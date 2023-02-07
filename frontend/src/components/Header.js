@@ -160,7 +160,7 @@ const Header = () => {
               <MenuItem key={flightnum} sx={{ p: 1 }}>
                 <IconButton
                   variant="contained"
-                  href="/seats/sa231"
+                  href={`/seats/${flightnum.toLowerCase()}`}
                   sx={{
                     color: "primary.select",
                     width: "100%",
@@ -202,7 +202,7 @@ const Header = () => {
                 sx={{
                   width: 50,
                   height: 50,
-                  zIndex: 20,
+                  // zIndex: 20,
                 }}
               />
               <Typography

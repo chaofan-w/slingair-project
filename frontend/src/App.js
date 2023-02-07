@@ -12,6 +12,7 @@ import ReservationPage from "./components/ReservationPage";
 import CartPage from "./components/CartPage";
 import SeatsFloorMap from "./components/SeatsFloorMap";
 import GlobalStyles from "./GlobalStyles";
+import SignUpForm from "./components/SignUpForm";
 
 function App() {
   const { displayCheckout, displaySignIn, reservationState, loginStatus } =
@@ -34,6 +35,7 @@ function App() {
           />
           <Route path="carts/:last_name/:email" element={<CartPage />} />
         </Route>
+        <Route path="signup" element={<SignUpForm />} />
       </Routes>
 
       {displayCheckout && <OrdersReview />}
