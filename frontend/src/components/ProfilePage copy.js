@@ -21,7 +21,6 @@ import {
 } from "@mui/material";
 import { Logout, Settings } from "@mui/icons-material";
 import ReservationContext from "../ReservationContext";
-import ReservationCardNonEditable from "./ReservationCardNonEditable";
 
 const ProfilePage = () => {
   const { last_name, email } = useParams();
@@ -59,43 +58,51 @@ const ProfilePage = () => {
   return (
     <Box>
       {loginUser && (
-        <List sx={{ width: "100%" }}>
+        <List>
           <ListItem>
-            <Stack direction="row" spacing={2}>
-              <Typography
-                variant="subtitle1"
-                textAlign={"right"}
-                sx={{ width: 100, color: "primary.dark" }}
-              >
-                Client Name:
-              </Typography>
-              <Typography variant="h6">
-                {loginUser.first_name + " " + loginUser.last_name}
-              </Typography>
-            </Stack>
+            <Typography>
+              <span style={{ color: "red" }}>First Name: </span>
+              {loginUser.first_name}
+            </Typography>
           </ListItem>
-
-          <ListItem sx={{ width: "100%" }}>
-            <Stack direction="row" spacing={2}>
-              <Typography
-                variant="subtitle1"
-                textAlign={"right"}
-                sx={{ width: 100, color: "primary.dark" }}
-              >
-                Email:
-              </Typography>
-              <Typography variant="h6">{loginUser.email}</Typography>
-            </Stack>
+          <ListItem>
+            <Typography>
+              <span style={{ color: "red" }}>Last Name: </span>
+              {loginUser.last_name}
+            </Typography>
           </ListItem>
-          <ListItem sx={{ width: "100%" }}>
-            <List sx={{ width: "100%" }}>
+          <ListItem>
+            <Typography>
+              <span style={{ color: "red" }}>Email: </span>
+              {loginUser.email}
+            </Typography>
+          </ListItem>
+          <ListItem>
+            <List>
               <ListSubheader>
                 <Typography>Reservations</Typography>
               </ListSubheader>
               {loginUser.reservations &&
                 loginUser.reservations.map((orderItem) => (
                   <ListItem key={orderItem._id}>
-                    <ReservationCardNonEditable orderItem={orderItem} />
+                    <Typography>
+                      <span style={{ color: "red" }}>Order Id: </span>
+                      {orderItem._id}
+                    </Typography>
+                    <List>
+                      {orderItem.order &&
+                        orderItem.order.map((order, index) => (
+                          <ListItem key={`order-${index}`}>
+                            <ListSubheader>
+                              <Typography>{order.flight}</Typography>
+                            </ListSubheader>
+                            {order.seat &&
+                              order.seat.map((seat) => (
+                                <ListItemButton>{seat}</ListItemButton>
+                              ))}
+                          </ListItem>
+                        ))}
+                    </List>
                   </ListItem>
                 ))}
             </List>

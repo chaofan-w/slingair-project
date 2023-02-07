@@ -39,7 +39,7 @@ import {
 import ReservationContext from "../ReservationContext";
 import logo from "./logo-icon.png";
 
-const ReservationCard = ({
+const ReservationCardNonEditable = ({
   orderItem,
   handleCancelReservations,
   handleToggle,
@@ -103,31 +103,11 @@ const ReservationCard = ({
                 sx={{
                   display: "flex",
                   alignItems: "flex-start",
-                  // border: "1px solid red",
+                  border: "3px solid rgba(255,255,255,0.32)",
+                  borderRadius: "10px",
+                  mb: 1,
                 }}
               >
-                <Box sx={{ width: 50, height: 50 }}>
-                  {selectedSeats &&
-                    Object.keys(selectedSeats).includes(orderItem._id) &&
-                    Object.keys(selectedSeats[orderItem._id]).includes(
-                      order.flight
-                    ) && (
-                      <IconButton
-                        key={orderItem._id}
-                        onClick={(e) => {
-                          handleCancelReservations(e, orderItem._id);
-                        }}
-                        value={`${order.flight}`}
-                        sx={{ width: 50, height: 50 }}
-                      >
-                        <Delete
-                          sx={{
-                            color: (theme) => theme.palette.warning.dark,
-                          }}
-                        />
-                      </IconButton>
-                    )}
-                </Box>
                 <AirlinesOutlined
                   sx={{ color: "secondary.dark", mr: 1, height: 50 }}
                 />
@@ -159,32 +139,13 @@ const ReservationCard = ({
                             minWidth: 100,
                             maxWidth: 100,
                             height: 50,
-                            // p: 0,
                           }}
                           role={undefined}
                           key={value}
-                          onClick={async () => {
-                            handleToggle(value);
-                            await selectSeat(order.flight, orderItem._id, seat);
-                            // checkEmptyOrder();
-                          }}
                         >
                           <ListItemIcon
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              // border: "1px solid red",
-                            }}
+                            sx={{ display: "flex", alignItems: "center" }}
                           >
-                            <Checkbox
-                              edge="start"
-                              checked={checked.indexOf(value) !== -1}
-                              tabIndex={-1}
-                              disableRipple
-                              inputProps={{
-                                "aria-labelledby": labelId,
-                              }}
-                            />
                             <ListItemText id={labelId} primary={seat} />
                           </ListItemIcon>
                         </ListItemButton>
@@ -200,4 +161,4 @@ const ReservationCard = ({
   );
 };
 
-export default ReservationCard;
+export default ReservationCardNonEditable;
