@@ -227,7 +227,8 @@ const Header = () => {
                       0
                     ) === 0
                   }
-                  onClick={() => setDisplayCheckout(!displayCheckout)}
+                  // onClick={() => setDisplayCheckout(!displayCheckout)}
+                  href={"/carts"}
                 >
                   <ShoppingCart sx={{ color: "common.black" }} />
                 </IconButton>
