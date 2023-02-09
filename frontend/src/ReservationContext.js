@@ -45,12 +45,13 @@ export const ReservationContextProvider = ({ children }) => {
       }
       case "select_seats": {
         return {
-          loginStatus: reservationState.loginStatus,
+          ...reservationState,
+          // loginStatus: reservationState.loginStatus,
           error: action.error,
-          lastName: reservationState.lastName,
-          loginEmail: reservationState.loginEmail,
+          // lastName: reservationState.lastName,
+          // loginEmail: reservationState.loginEmail,
           carts: action.carts,
-          reservations: reservationState.reservations,
+          // reservations: reservationState.reservations,
           message: action.message,
         };
       }
