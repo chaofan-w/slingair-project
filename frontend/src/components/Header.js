@@ -229,7 +229,8 @@ const Header = () => {
                     ) === 0
                   }
                   // onClick={() => setDisplayCheckout(!displayCheckout)}
-                  href={"/carts"}
+                  // href={"/carts"}
+                  onClick={() => navigate("/carts")}
                 >
                   <ShoppingCart sx={{ color: "common.black" }} />
                 </IconButton>
@@ -407,7 +408,9 @@ const Header = () => {
           </MenuItem>
           <MenuItem>
             <Link
-              to={`/customers/carts/${reservationState.lastName}/${reservationState.loginEmail}`}
+              to={"/carts"}
+              // to={`/customers/carts/${reservationState.lastName}/${reservationState.loginEmail}`
+              // }
               style={{
                 textDecoration: "none",
                 pointerEvents:
