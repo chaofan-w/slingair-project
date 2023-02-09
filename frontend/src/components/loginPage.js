@@ -134,7 +134,7 @@ const LoginPage = () => {
             type="button"
             // fullWidth
             sx={{ color: "primary.dark" }}
-            href={"/signup"}
+            href={"/customers/signup"}
           >
             NEW CLIENT JOIN
           </Button>
