@@ -160,7 +160,8 @@ const Header = () => {
               <MenuItem key={flightnum} sx={{ p: 1 }}>
                 <IconButton
                   variant="contained"
-                  href={`/seats/${flightnum.toLowerCase()}`}
+                  // href={`/seats/${flightnum.toLowerCase()}`}
+                  onClick={() => navigate(`/seats/${flightnum.toLowerCase()}`)}
                   sx={{
                     color: "primary.select",
                     width: "100%",
