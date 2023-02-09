@@ -1,5 +1,5 @@
 const { MongoClient } = require("mongodb");
-require("dotenv").config();
+// require("dotenv").config();
 // first require dotenv.config(), then get MONGO_URI from process.env
 const { MONGO_URI } = process.env;
 const ObjectId = require("mongodb").ObjectId;
@@ -467,7 +467,7 @@ const deleteReservations = async (req, res) => {
     await db.collection("reservations").deleteMany({
       order: [],
     });
-    sendResponse(res, 200, null, 'delete done')
+    sendResponse(res, 200, null, "delete done");
     client.close();
     console.log("disconnected");
   } catch (err) {
