@@ -33,9 +33,9 @@ function App() {
             path="reservations/:last_name/:email"
             element={<ReservationPage />}
           />
+          <Route path="signup" element={<SignUpForm />} />
         </Route>
         <Route path="carts" element={<CartPage />} />
-        <Route path="signup" element={<SignUpForm />} />
       </Routes>
 
       {/* {displayCheckout && <OrdersReview />} */}
