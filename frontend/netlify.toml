@@ -1,5 +1,5 @@
 [[redirects]]
   from = "/api/*"  
   to = "https://slingair-backend-2023.herokuapp.com/api/:splat"
-  status = 200
+  status = 301
   force = true
