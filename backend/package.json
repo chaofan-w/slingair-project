@@ -22,5 +22,9 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
+  },
+  "engines": {
+    "node": "v18.12.0",
+    "yarn": "1.23.0-20200615.1913"
   }
 }
