@@ -24,8 +24,13 @@ import ReservationContext from "../ReservationContext";
 const SignUpForm = () => {
   const navigate = useNavigate();
 
-  const { reservationState, displaySignUp, setDisplaySignUp } =
-    React.useContext(ReservationContext);
+  const {
+    reservationState,
+    displaySignUp,
+    setDisplaySignUp,
+    reservationDispatch,
+    setDisplayAlert,
+  } = React.useContext(ReservationContext);
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
@@ -45,11 +50,27 @@ const SignUpForm = () => {
         email: formValue.get("email"),
       }),
     };
-    await fetch("/api/customers", option);
-    setFirstName("");
-    setLastName("");
-    setEmail("");
-    navigate("/");
+    await fetch("/api/customers", option)
+      .then((res) => res.json())
+      .then(async (data) => {
+        if (data.status === 400) {
+          await reservationDispatch({
+            type: "throwMessage",
+            message: data.message,
+          });
+          setDisplayAlert({ severity: "warning", display: true });
+        } else if (data.status === 200) {
+          await reservationDispatch({
+            type: "throwMessage",
+            message: data.message,
+          });
+          setDisplayAlert({ severity: "success", display: true });
+          setFirstName("");
+          setLastName("");
+          setEmail("");
+          navigate("/");
+        }
+      });
   };
   return (
     <>

@@ -1,5 +1,5 @@
 const { MongoClient } = require("mongodb");
-// require("dotenv").config();
+require("dotenv").config();
 // first require dotenv.config(), then get MONGO_URI from process.env
 const { MONGO_URI } = process.env;
 const ObjectId = require("mongodb").ObjectId;
@@ -246,7 +246,7 @@ const addCustomer = async (req, res) => {
         res,
         400,
         null,
-        "email already registered, please use another email."
+        "Email already registered, please use another email."
       );
       client.close();
       console.log("disconnected");
@@ -258,7 +258,12 @@ const addCustomer = async (req, res) => {
         email: email,
         activated: true,
       });
-      sendResponse(res, 200, null, "account registered successfully");
+      sendResponse(
+        res,
+        200,
+        null,
+        "Account registered successfully, you can login now!"
+      );
       client.close();
       console.log("disconnected");
       return;
@@ -370,7 +375,12 @@ const addReservations = async (req, res) => {
     });
     client.close();
     console.log("disconnected");
-    sendResponse(res, 200, order, "tickets booked successfully");
+    sendResponse(
+      res,
+      200,
+      order,
+      "your reservation is confirmed, thanks for choosing Sling Airline!"
+    );
   } catch (err) {
     console.log(err);
   }

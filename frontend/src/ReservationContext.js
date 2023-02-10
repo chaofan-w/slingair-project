@@ -72,6 +72,12 @@ export const ReservationContextProvider = ({ children }) => {
           loginStatus: false,
         };
       }
+      case "throwMessage": {
+        return {
+          ...reservationState,
+          message: action.message || "",
+        };
+      }
       default: {
         return reservationState;
       }

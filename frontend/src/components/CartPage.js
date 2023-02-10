@@ -35,8 +35,12 @@ import logo from "./logo-icon.png";
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const { reservationState, reservationDispatch, setDisplayCheckout } =
-    React.useContext(ReservationContext);
+  const {
+    reservationState,
+    reservationDispatch,
+    setDisplayCheckout,
+    setDisplayAlert,
+  } = React.useContext(ReservationContext);
   const { carts, lastName, loginEmail } = reservationState;
   const [checked, setChecked] = React.useState([]);
   const [selectedSeats, setSelectedSeats] = React.useState(null);
@@ -99,8 +103,6 @@ const CartPage = () => {
     }
   };
 
-  console.log(selectedSeats);
-
   const deleteSeatsFromCarts = (e) => {
     let currCarts = reservationState.carts;
     let flightnum = e.currentTarget.value;
@@ -141,36 +143,37 @@ const CartPage = () => {
         order: reservationState.carts,
       }),
     };
-    await fetch("/api/reservations", option);
-    // await reservationState.carts.forEach(async (flight) => {
-    //   console.log(flight.flight);
-    //   await fetch("/api/seats", {
-    //     method: "PATCH",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Accept: "application/json",
-    //     },
-    //     body: JSON.stringify({ flightNum: flight.flight }),
-    //   });
-    // });
-    await fetch(
-      `/api/customers/${reservationState.lastName}/${reservationState.loginEmail}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        reservationDispatch({
-          type: "get_profile",
-          loginStatus: reservationState.loginStatus,
-          error: "",
-          lastName: data.data.last_name,
-          loginEmail: data.data.email,
-          carts: [],
-          reservations: data.data.reservations,
-          messge: "",
+    try {
+      await fetch("/api/reservations", option)
+        .then((res) => res.json())
+        .then(async (result) => {
+          if (result.status === 200) {
+            console.log(result.message);
+            await fetch(
+              `/api/customers/${reservationState.lastName}/${reservationState.loginEmail}`
+            )
+              .then((res) => res.json())
+              .then((data) => {
+                reservationDispatch({
+                  type: "get_profile",
+                  loginStatus: reservationState.loginStatus,
+                  error: "",
+                  lastName: data.data.last_name,
+                  loginEmail: data.data.email,
+                  carts: [],
+                  reservations: data.data.reservations,
+                  message: result.message || "",
+                });
+              });
+          }
         });
-      });
-    setDisplayCheckout(false);
-    navigate("/");
+
+      setDisplayCheckout(false);
+      setDisplayAlert({ severity: "success", display: true });
+      navigate("/");
+    } catch (err) {
+      console.log(err);
+    }
   };
   return (
     <React.Fragment>
@@ -317,9 +320,17 @@ const CartPage = () => {
           </List>
         </CardContent>
       </Card>
-      <Box mt={4} mb={1}>
-        <Button variant="contained" onClick={handleSubmit} fullWidth>
-          Submit
+      <Box
+        mt={4}
+        mb={1}
+        sx={{
+          width: "100%",
+          display: "grid",
+          placeItems: "center",
+        }}
+      >
+        <Button variant="contained" onClick={handleSubmit} sx={{ width: 120 }}>
+          Checkout
         </Button>
       </Box>
     </React.Fragment>

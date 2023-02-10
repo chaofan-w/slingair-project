@@ -1,6 +1,14 @@
 import * as React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Box, Paper, Typography, Button, Fade, Snackbar } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Typography,
+  Button,
+  Fade,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import Home from "./components/Home";
 import Header from "./components/Header";
 import Seats from "./components/Seats";
@@ -13,10 +21,30 @@ import CartPage from "./components/CartPage";
 import SeatsFloorMap from "./components/SeatsFloorMap";
 import GlobalStyles from "./GlobalStyles";
 import SignUpForm from "./components/SignUpForm";
+import styled from "styled-components";
+import MuiAlert from "@mui/material/Alert";
 
 function App() {
-  const { displayCheckout, displaySignIn, reservationState, loginStatus } =
-    React.useContext(ReservationContext);
+  const {
+    displayAlert,
+    setDisplayAlert,
+    reservationState,
+    reservationDispatch,
+    loginStatus,
+  } = React.useContext(ReservationContext);
+  // console.log(reservationState);
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return (
+      <MuiAlert
+        elevation={6}
+        ref={ref}
+        variant="filled"
+        sx={{ zIndex: 10, width: "50%", minWidth: 360 }}
+        {...props}
+      />
+    );
+  });
+  console.log(reservationState.message || "no message so far");
   return (
     <Router>
       <GlobalStyles />
@@ -37,8 +65,50 @@ function App() {
         </Route>
         <Route path="carts" element={<CartPage />} />
       </Routes>
-
-      {/* {displayCheckout && <OrdersReview />} */}
+      {displayAlert && (
+        <Snackbar
+          open={displayAlert.display}
+          autoHideDuration={3000}
+          onClose={(e, reason) => {
+            if (reason === "clickaway") {
+              return;
+            }
+            setDisplayAlert({ severity: "info", display: false });
+            reservationDispatch({
+              type: "clearMessage",
+            });
+          }}
+          sx={{ width: "50%", color: (theme) => theme.palette.white }}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "center",
+          }}
+        >
+          <Alert
+            variant="filled"
+            severity={displayAlert.severity}
+            onClose={(e, reason) => {
+              if (reason === "clickaway") {
+                return;
+              }
+              setDisplayAlert({
+                severity: displayAlert.severity,
+                display: false,
+              });
+              reservationDispatch({
+                type: "throwMessage",
+                message: "",
+              });
+            }}
+            sx={{
+              width: "100%",
+              color: (theme) => theme.palette.white,
+            }}
+          >
+            {reservationState.message}
+          </Alert>
+        </Snackbar>
+      )}
     </Router>
   );
 }

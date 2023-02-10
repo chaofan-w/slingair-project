@@ -50,10 +50,40 @@ const ReservationCard = ({
 }) => {
   // const { last_name, email } = useParams();
   // const [loginUser, setLoginUser] = React.useState(null);
-  // const { reservationState, reservationDispatch } =
-  //   React.useContext(ReservationContext);
+  const { reservationState, reservationDispatch } =
+    React.useContext(ReservationContext);
+  const [selectAllFlights, setSelectAllFlights] = React.useState({});
   // const [selectedSeats, setSelectedSeats] = React.useState(null);
   // const [checked, setChecked] = React.useState([]);
+
+  let reservationFlight;
+  if (reservationState.reservations) {
+    reservationFlight = reservationState.reservations.find(
+      (order) => order._id === orderItem._id
+    ).order;
+  }
+
+  let reservedFlightSeatTotal = reservationFlight.reduce(
+    (prev, curr) => prev + curr.seat.length,
+    0
+  );
+  console.log(reservedFlightSeatTotal);
+
+  React.useEffect(() => {
+    if (selectedSeats && selectedSeats[orderItem._id]) {
+      let selectedFlightSeatTotal = Object.values(
+        selectedSeats[`${orderItem._id}`]
+      ).reduce((prev, curr) => prev + curr.length, 0);
+      setSelectAllFlights({
+        ...selectAllFlights,
+        [orderItem._id]: reservedFlightSeatTotal === selectedFlightSeatTotal,
+      });
+    }
+  }, [selectedSeats]);
+
+  // console.log(selectAllFlights);
+  console.log(selectedSeats);
+
   return (
     <Card
       sx={{
@@ -64,6 +94,7 @@ const ReservationCard = ({
         backgroundPosition: "top",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
+        position: "relative",
       }}
     >
       <CardHeader
@@ -81,6 +112,26 @@ const ReservationCard = ({
         subheader={`Order No.: ${orderItem._id}`}
         sx={{ bgcolor: "primary.main", py: 0 }}
       />
+      <Box
+        sx={{ width: 50, height: 50, position: "absolute", top: 0, right: 0 }}
+      >
+        {selectAllFlights[orderItem._id] && (
+          <IconButton
+            key={orderItem._id}
+            onClick={(e) => {
+              handleCancelReservations(e, orderItem._id);
+            }}
+            value={"all"}
+            sx={{ width: 50, height: 50 }}
+          >
+            <Delete
+              sx={{
+                color: (theme) => theme.palette.warning.dark,
+              }}
+            />
+          </IconButton>
+        )}
+      </Box>
 
       <CardContent
         sx={{

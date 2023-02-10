@@ -31,7 +31,7 @@ import ReservationCard from "./ReservationCard";
 const ReservationPage = () => {
   const { last_name, email } = useParams();
   const [loginUser, setLoginUser] = React.useState(null);
-  const { reservationState, reservationDispatch } =
+  const { reservationState, reservationDispatch, setDisplayAlert } =
     React.useContext(ReservationContext);
   const [selectedSeats, setSelectedSeats] = React.useState(null);
   const [checked, setChecked] = React.useState([]);
@@ -56,7 +56,6 @@ const ReservationPage = () => {
         .then((res) => res.json())
         .then((data) => {
           if (data.status === 200) {
-            console.log(data.data);
             setLoginUser(data.data);
             reservationDispatch({
               type: "get_profile",
@@ -78,7 +77,6 @@ const ReservationPage = () => {
 
   const selectSeat = async (flight, orderId, seat) => {
     if (!selectedSeats) {
-      console.log("no element");
       setSelectedSeats({
         [`${orderId}`]: { [`${flight}`]: [seat] },
       });
@@ -128,19 +126,45 @@ const ReservationPage = () => {
   const handleCancelReservations = async (e, orderNum) => {
     e.preventDefault();
     const orderId = orderNum;
-    const flight = e.currentTarget.value;
     const reservationFlight = reservationState.reservations.find(
       (order) => order._id === orderId
     ).order;
     console.log(reservationFlight);
 
-    const selectAll =
-      selectedSeats[orderNum][flight].length ===
-      reservationFlight.find(
-        (f) => f.flight.toUpperCase() === flight.toUpperCase()
-      ).seat.length;
+    let reservedFlightSeatTotal = reservationFlight.reduce(
+      (prev, curr) => prev + curr.seat.length,
+      0
+    );
 
-    const seat = selectAll ? "all" : selectedSeats[orderNum][flight];
+    let selectedFlightSeatTotal = Object.values(
+      selectedSeats[`${orderId}`]
+    ).reduce((prev, curr) => prev + curr.length, 0);
+
+    const selectAllFlights =
+      reservedFlightSeatTotal === selectedFlightSeatTotal;
+
+    console.log(
+      `reservedTotal: ${reservedFlightSeatTotal}, selectedTotal: ${selectedFlightSeatTotal}`
+    );
+
+    const flight = selectAllFlights ? "all" : e.currentTarget.value;
+    let seat;
+    if (flight === "all") {
+      seat = "all";
+    } else {
+      const reservationFlight = reservationState.reservations.find(
+        (order) => order._id === orderId
+      ).order;
+      const selectAll =
+        selectedSeats[orderNum][flight].length ===
+        reservationFlight.find(
+          (f) => f.flight.toUpperCase() === flight.toUpperCase()
+        ).seat.length;
+
+      seat = selectAll ? "all" : selectedSeats[orderNum][flight];
+    }
+
+    let throwedMsg = "";
     await fetch("/api/reservations", {
       method: "PATCH",
       headers: {
@@ -152,7 +176,11 @@ const ReservationPage = () => {
         seat: seat,
         orderId: orderId,
       }),
-    });
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        throwedMsg = data.message;
+      });
 
     await fetch("/api/reservations", {
       method: "DELETE",
@@ -176,13 +204,15 @@ const ReservationPage = () => {
           loginEmail: data.data.email,
           carts: reservationState.carts,
           reservations: data.data.reservations,
-          messge: "",
+          message: throwedMsg,
         });
       });
 
     const newSelectedSeats = { ...selectedSeats };
     delete newSelectedSeats[orderNum][flight];
     setSelectedSeats({ ...newSelectedSeats });
+
+    setDisplayAlert({ severity: "success", display: true });
   };
 
   console.log(selectedSeats);

@@ -29,7 +29,7 @@ import { Chair } from "@mui/icons-material";
 
 const SeatsFloorMap = () => {
   const [seats, setSeats] = React.useState(null);
-  const { reservationState, reservationDispatch } =
+  const { reservationState, reservationDispatch, setDisplayAlert } =
     React.useContext(ReservationContext);
   const { flightnum } = useParams();
 
@@ -64,8 +64,6 @@ const SeatsFloorMap = () => {
       message: "",
     });
   };
-
-  console.log(reservationState);
 
   React.useEffect(() => {
     let ignore = false;
@@ -123,6 +121,11 @@ const SeatsFloorMap = () => {
           bgcolor: (theme) => theme.palette.secondary.light,
         }}
       >
+        <Typography
+          variant="h4"
+          fontWeight={"medium"}
+          sx={{ color: "primary.select", m: 2 }}
+        >{`Flight: ${flightnum.toUpperCase()}`}</Typography>
         <Stack
           width={{ xs: 460, sm: 580, md: 820 }}
           direction={"row"}
@@ -202,8 +205,19 @@ const SeatsFloorMap = () => {
                       width={{ xs: 40, sm: 50, md: 60 }}
                       // key={`${flightnum}-${seat._id}`}
                       disabled={seat.isAvailable ? false : true}
-                      onClick={(e) => {
-                        reservationState.loginStatus && handleToggleSeats(e);
+                      onClick={async (e) => {
+                        if (reservationState.loginStatus) {
+                          handleToggleSeats(e);
+                        } else {
+                          await reservationDispatch({
+                            type: "throwMessage",
+                            message: "Please login to book seats",
+                          });
+                          setDisplayAlert({
+                            severity: "info",
+                            display: true,
+                          });
+                        }
                       }}
                       value={seat._id}
                       sx={{
