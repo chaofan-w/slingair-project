@@ -222,7 +222,7 @@ const getOneCustomer = async (req, res) => {
         ""
       );
     } else {
-      sendResponse(res, 404, null, "no customer found");
+      sendResponse(res, 404, null, "the last name and email does not match");
     }
   } catch (err) {
     console.log(err);
