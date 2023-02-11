@@ -44,7 +44,7 @@ function App() {
       />
     );
   });
-  console.log(reservationState.message || "no message so far");
+
   return (
     <Router>
       <GlobalStyles />
@@ -62,6 +62,7 @@ function App() {
             element={<ReservationPage />}
           />
           <Route path="signup" element={<SignUpForm />} />
+          <Route path="login" element={<LoginPage />} />
         </Route>
         <Route path="carts" element={<CartPage />} />
       </Routes>

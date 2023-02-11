@@ -320,6 +320,7 @@ const Header = () => {
             <IconButton
               onClick={() => {
                 setDisplaySignIn(true);
+                navigate("/customers/login");
               }}
               sx={{
                 color: "primary.select",

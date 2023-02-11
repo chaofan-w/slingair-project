@@ -35,8 +35,9 @@ const Home = () => {
       <Typography
         variant={"h6"}
         sx={{
+          maxWidth: 500,
           minWidth: 300,
-          color: "primary.dark",
+          color: "common.black",
           position: "absolute",
           top: { xs: "50%", sm: "40%" },
           right: { xs: "50%", sm: 20 },
@@ -44,7 +45,7 @@ const Home = () => {
           transform: { xs: "translateX(50%)", sm: "translateX(0)" },
         }}
       >
-        Home, a fly away from Home
+        Discover the world, one flight at a time.
       </Typography>
       <Stack
         direction="row"
