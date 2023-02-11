@@ -44,7 +44,7 @@ function App() {
       />
     );
   });
-  // console.log(reservationState.message || "no message so far");
+
   return (
     <Router>
       <GlobalStyles />
