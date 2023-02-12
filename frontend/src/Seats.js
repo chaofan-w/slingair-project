@@ -20,6 +20,7 @@ import {
   ListItemButton,
 } from "@mui/material";
 import ReservationContext from "../ReservationContext";
+import produce from "immer";
 
 const Seats = () => {
   const [seats, setSeats] = React.useState(null);

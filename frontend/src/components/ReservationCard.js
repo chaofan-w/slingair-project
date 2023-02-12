@@ -67,7 +67,7 @@ const ReservationCard = ({
     (prev, curr) => prev + curr.seat.length,
     0
   );
-  console.log(reservedFlightSeatTotal);
+  // console.log(reservedFlightSeatTotal);
 
   React.useEffect(() => {
     if (selectedSeats && selectedSeats[orderItem._id]) {
@@ -82,7 +82,7 @@ const ReservationCard = ({
   }, [selectedSeats]);
 
   // console.log(selectAllFlights);
-  console.log(selectedSeats);
+  // console.log(selectedSeats);
 
   return (
     <Card
