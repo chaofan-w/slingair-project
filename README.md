@@ -1,3 +1,3 @@
 # slingair-project
-Demo Site:
+LiveDemo Site:
 https://slingair.netlify.app/
