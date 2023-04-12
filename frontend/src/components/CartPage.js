@@ -1,37 +1,29 @@
 import {
   Box,
-  Paper,
   Typography,
   Button,
-  Fade,
-  Snackbar,
   Stack,
   List,
   ListItem,
-  ListSubheader,
   ListItemButton,
   ListItemIcon,
   IconButton,
   ListItemText,
   Checkbox,
-  Tooltip,
   Card,
   CardHeader,
   CardContent,
-  CardMedia,
   Divider,
 } from "@mui/material";
 import * as React from "react";
 import ReservationContext from "../ReservationContext";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  Logout,
-  Settings,
-  Comment,
   Delete,
   AirlinesOutlined,
 } from "@mui/icons-material";
 import logo from "./logo-icon.png";
+import produce from "immer";
 
 const CartPage = () => {
   const navigate = useNavigate();
@@ -43,92 +35,89 @@ const CartPage = () => {
   } = React.useContext(ReservationContext);
   const { carts, lastName, loginEmail } = reservationState;
   const [checked, setChecked] = React.useState([]);
-  const [selectedSeats, setSelectedSeats] = React.useState(null);
+  const [selectedSeats, setSelectedSeats] = React.useState({});
 
-  const handleToggle = (value) => {
-    const currentIndex = checked.indexOf(value);
-    let newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-
-    setChecked(newChecked);
-  };
+  const handleToggle = React.useCallback((value) => {
+    setChecked(
+      produce((draft) => {
+        const currentIndex = checked.indexOf(value);
+        if (currentIndex === -1) {
+          draft.push(value);
+        } else {
+          draft.splice(currentIndex, 1);
+        }
+      })
+    );
+  });
 
   const selectSeat = async (flight, seat) => {
-    if (!selectedSeats) {
-      console.log("no element");
-      setSelectedSeats({
-        [`${flight}`]: [seat],
-      });
-      return;
-    }
+    // if (!selectedSeats) {
+    //   console.log("no element");
+    //   setSelectedSeats({
+    //     [`${flight}`]: [seat],
+    //   });
+    //   return;
+    // }
+    setSelectedSeats(
+      produce(selectedSeats, (draft) => {
+        if (!Object.keys(draft).includes(flight)) {
+          draft[flight] = [seat];
+          return;
+        }
 
-    if (selectedSeats && !Object.keys(selectedSeats).includes(flight)) {
-      setSelectedSeats({
-        ...selectedSeats,
-        [`${flight}`]: [seat],
-      });
-      return;
-    }
-
-    if (selectedSeats && Object.keys(selectedSeats).includes(flight)) {
-      let currOrder = selectedSeats[flight];
-      console.log(currOrder);
-      let newOrder;
-      if (currOrder.includes(seat)) {
-        newOrder = currOrder.filter((seatNum) => seatNum !== seat);
-      } else {
-        currOrder.push(seat);
-        newOrder = [...currOrder];
-      }
-
-      if (newOrder.length === 0) {
-        const updateSelectedSeats = { ...selectedSeats };
-        delete updateSelectedSeats[flight];
-
-        setSelectedSeats({
-          ...updateSelectedSeats,
-        });
-        return;
-      } else {
-        setSelectedSeats({
-          ...selectedSeats,
-          [flight]: newOrder,
-        });
-      }
-    }
+        if (Object.keys(draft).includes(flight)) {
+          let currOrder = draft[flight];
+          if (currOrder.includes(seat) && currOrder.length > 1) {
+            currOrder.splice(currOrder.indexOf(seat), 1);
+          } else if (currOrder.includes(seat) && currOrder.length === 1) {
+            delete draft[flight];
+          } else {
+            currOrder.push(seat);
+          }
+        } else {
+          draft[flight] = [seat];
+        }
+      })
+    );
   };
 
-  const deleteSeatsFromCarts = (e) => {
-    let currCarts = reservationState.carts;
+  const deleteSeatsFromCarts = React.useCallback((e) => {
     let flightnum = e.currentTarget.value;
-
-    currCarts = currCarts.map((order) => {
-      if (order.flight === flightnum) {
-        const updateseat = order.seat.filter(
-          (i) => !selectedSeats[flightnum].includes(i)
-        );
-        let updateSelects = selectedSeats;
-        delete updateSelects[flightnum];
-
-        setSelectedSeats(updateSelects);
-        return { ...order, seat: updateseat };
-      } else {
-        return order;
-      }
+    const currCarts = produce(reservationState.carts, (draft) => {
+      const currOrder = draft.find((order) => order.flight === flightnum);
+      selectedSeats[flightnum].forEach((seatnum) => {
+        currOrder.seat.splice(currOrder.seat.indexOf(seatnum), 1);
+      });
     });
 
-    return reservationDispatch({
+    // currCarts = currCarts.map((order) => {
+    //   if (order.flight === flightnum) {
+    //     const updateseat = order.seat.filter(
+    //       (i) => !selectedSeats[flightnum].includes(i)
+    //     );
+    //     let updateSelects = selectedSeats;
+    //     delete updateSelects[flightnum];
+
+    //     setSelectedSeats(updateSelects);
+    //     return { ...order, seat: updateseat };
+    //   } else {
+    //     return order;
+    //   }
+    // });
+
+    reservationDispatch({
       type: "select_seats",
       error: "",
       carts: currCarts.filter((order) => order.seat.length > 0),
       message: "",
     });
-  };
+
+    setSelectedSeats(
+      produce(selectedSeats, (draft) => {
+        delete draft[flightnum];
+      })
+    );
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -175,6 +164,7 @@ const CartPage = () => {
       console.log(err);
     }
   };
+  console.log(selectedSeats);
   return (
     <React.Fragment>
       <Card

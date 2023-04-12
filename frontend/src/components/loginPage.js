@@ -1,18 +1,5 @@
 import * as React from "react";
-import {
-  Box,
-  Typography,
-  Input,
-  Button,
-  Card,
-  Switch,
-  Grid,
-  MuiLink,
-  TextField,
-  Divider,
-  IconButton,
-  Icon,
-} from "@mui/material";
+import { Box, Button, Card, TextField, IconButton, Icon } from "@mui/material";
 import ReservationContext from "../ReservationContext";
 import { HighlightOffOutlined } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
@@ -26,8 +13,8 @@ const LoginPage = () => {
     setLoginStatus,
     setDisplayAlert,
   } = React.useContext(ReservationContext);
-  const [email, setEmail] = React.useState("");
-  const [lastName, setLastName] = React.useState("");
+  const [email, setEmail] = React.useState("test@email.com");
+  const [lastName, setLastName] = React.useState("test");
   const handleSubmit = (e) => {
     e.preventDefault();
     fetch(`/api/customers/${lastName}/${email}`)

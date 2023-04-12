@@ -1,27 +1,16 @@
 import * as React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import {
-  Box,
-  Paper,
-  Typography,
-  Button,
-  Fade,
-  Snackbar,
-  Alert,
-} from "@mui/material";
+import { Snackbar } from "@mui/material";
 import Home from "./components/Home";
 import Header from "./components/Header";
-import Seats from "./components/Seats";
 import ProfilePage from "./components/ProfilePage";
 import LoginPage from "./components/loginPage";
-import OrdersReview from "./components/CartPage";
 import ReservationContext from "./ReservationContext";
 import ReservationPage from "./components/ReservationPage";
 import CartPage from "./components/CartPage";
 import SeatsFloorMap from "./components/SeatsFloorMap";
 import GlobalStyles from "./GlobalStyles";
 import SignUpForm from "./components/SignUpForm";
-import styled from "styled-components";
 import MuiAlert from "@mui/material/Alert";
 
 function App() {

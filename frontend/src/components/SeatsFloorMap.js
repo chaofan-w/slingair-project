@@ -1,31 +1,10 @@
 import * as React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  useParams,
-} from "react-router-dom";
-import {
-  Box,
-  Paper,
-  Typography,
-  Button,
-  Fade,
-  Snackbar,
-  Stack,
-  List,
-  ListItem,
-  ListSubheader,
-  ListItemButton,
-  IconButton,
-  Grid,
-  ButtonBase,
-  Tooltip,
-} from "@mui/material";
+import { BrowserRouter as Router, useParams } from "react-router-dom";
+import { Box, Paper, Typography, Stack, Grid, ButtonBase } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import ReservationContext from "../ReservationContext";
 import { Chair } from "@mui/icons-material";
+import produce from "immer";
 
 const SeatsFloorMap = () => {
   const [seats, setSeats] = React.useState(null);
@@ -36,31 +15,28 @@ const SeatsFloorMap = () => {
   const handleToggleSeats = (e) => {
     const seatId = e.currentTarget.value;
     let currCarts = reservationState.carts;
-    let flightInCarts = currCarts.find((order) => order.flight === flightnum);
-    // console.log(flightInCarts);
-    if (!flightInCarts) {
-      currCarts.push({ flight: flightnum, seat: [seatId] });
-    } else {
-      // console.log(flightInCarts);
-      currCarts = currCarts.map((order) => {
-        if (order.flight === flightnum) {
-          if (order.seat.includes(seatId)) {
-            const updateseat = order.seat.filter((i) => i !== seatId);
-            return { ...order, seat: updateseat };
-          } else {
-            order.seat.push(seatId);
-            return order;
-          }
+
+    const updateCarts = produce(currCarts, (draft) => {
+      let flightInCarts = draft.find((order) => order.flight === flightnum);
+
+      if (!flightInCarts) {
+        draft.push({ flight: flightnum, seat: [seatId] });
+      } else {
+        if (flightInCarts.seat.includes(seatId)) {
+          flightInCarts["seat"].splice(
+            flightInCarts["seat"].indexOf(seatId),
+            1
+          );
         } else {
-          return order;
+          flightInCarts.seat.push(seatId);
         }
-      });
-    }
+      }
+    });
 
     return reservationDispatch({
       type: "select_seats",
       error: "",
-      carts: currCarts.filter((order) => order.seat.length > 0),
+      carts: updateCarts.filter((order) => order.seat.length > 0),
       message: "",
     });
   };
@@ -75,19 +51,28 @@ const SeatsFloorMap = () => {
           // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare
           // sort array of string with mix of numbers, makes sure follow 1, 2, 3, number order, rather than 1, 10, 100, 2, 20, 3...
           //By passing the numeric: true option, it will smartly recognize numbers in the string. You can do case-insensitive using sensitivity: 'base'.
-          const sortedSeats = seats.sort((a, b) =>
-            a._id.localeCompare(b._id, "en", {
-              sensitivity: "base",
-              numeric: true,
+          // const sortedSeats = seats.sort((a, b) =>
+          //   a._id.localeCompare(b._id, "en", {
+          //     sensitivity: "base",
+          //     numeric: true,
+          //   })
+          // );
+          setSeats(
+            produce(seats, (draft) => {
+              draft.sort((a, b) =>
+                a._id.localeCompare(b._id, "en", {
+                  sensitivity: "base",
+                  numeric: true,
+                })
+              );
             })
           );
-          setSeats(sortedSeats);
         });
     }
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [flightnum]);
 
   const Item = styled(Paper)(({ theme }) => ({
     backgroundColor:
@@ -277,35 +262,6 @@ const SeatsFloorMap = () => {
           </Grid>
         </Stack>
       </Paper>
-      {/* <List>
-        <ListSubheader>{"Flight: " + flightnum.toUpperCase()}</ListSubheader>
-        {seats &&
-          seats.map((seat, index) => (
-            <Button
-              key={`${flightnum}-${seat._id}`}
-              disabled={seat.isAvailable ? false : true}
-              onClick={(e) => {
-                reservationState.loginStatus && handleToggleSeats(e);
-              }}
-              value={seat._id}
-              sx={{
-                color: reservationState.carts.find(
-                  (order) =>
-                    order.flight === flightnum && order.seat.includes(seat._id)
-                )
-                  ? "red"
-                  : (theme) => theme.palette.primary.main,
-              }}
-            >
-              <Typography>{seat._id}</Typography>
-              {" --- "}
-              <Typography>
-                {`${seat.isAvailable ? "available" : "booked"}`}
-              </Typography>
-            </Button>
-          ))}
-          
-      </List> */}
     </Box>
   );
 };

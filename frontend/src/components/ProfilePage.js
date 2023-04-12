@@ -1,25 +1,13 @@
 import * as React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  useParams,
-} from "react-router-dom";
+import { BrowserRouter as Router, useParams } from "react-router-dom";
 import {
   Box,
-  Paper,
   Typography,
-  Button,
-  Fade,
-  Snackbar,
   Stack,
   List,
   ListItem,
   ListSubheader,
-  ListItemButton,
 } from "@mui/material";
-import { Logout, Settings } from "@mui/icons-material";
 import ReservationContext from "../ReservationContext";
 import ReservationCardNonEditable from "./ReservationCardNonEditable";
 
@@ -36,7 +24,6 @@ const ProfilePage = () => {
         .then((res) => res.json())
         .then((data) => {
           if (data.status === 200) {
-            console.log(data.data);
             setLoginUser(data.data);
             reservationDispatch({
               type: "get_profile",

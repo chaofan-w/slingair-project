@@ -1,39 +1,16 @@
 import * as React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  useParams,
-} from "react-router-dom";
-import {
-  Box,
-  Paper,
-  Typography,
-  Button,
-  Fade,
-  Snackbar,
-  Stack,
-  List,
-  ListItem,
-  ListSubheader,
-  ListItemButton,
-  ListItemIcon,
-  IconButton,
-  ListItemText,
-  Checkbox,
-  Tooltip,
-} from "@mui/material";
-import { Logout, Settings, Comment, Delete } from "@mui/icons-material";
+import { BrowserRouter as Router, useParams } from "react-router-dom";
+import { Box, Typography, List, ListItem, ListSubheader } from "@mui/material";
 import ReservationContext from "../ReservationContext";
 import ReservationCard from "./ReservationCard";
+import produce from "immer";
 
 const ReservationPage = () => {
   const { last_name, email } = useParams();
   const [loginUser, setLoginUser] = React.useState(null);
   const { reservationState, reservationDispatch, setDisplayAlert } =
     React.useContext(ReservationContext);
-  const [selectedSeats, setSelectedSeats] = React.useState(null);
+  const [selectedSeats, setSelectedSeats] = React.useState({});
   const [checked, setChecked] = React.useState([]);
 
   const handleToggle = (value) => {
@@ -76,51 +53,47 @@ const ReservationPage = () => {
   }, [last_name, email]);
 
   const selectSeat = async (flight, orderId, seat) => {
-    if (!selectedSeats) {
-      setSelectedSeats({
-        [`${orderId}`]: { [`${flight}`]: [seat] },
-      });
-      return;
-    }
-
-    if (selectedSeats && !Object.keys(selectedSeats).includes(orderId)) {
-      setSelectedSeats({
-        ...selectedSeats,
-        [`${orderId}`]: { [`${flight}`]: [seat] },
-      });
-      return;
-    }
-
-    if (selectedSeats && Object.keys(selectedSeats).includes(orderId)) {
-      let currOrder = selectedSeats[orderId];
-      let newOrder;
-      if (
-        Object.keys(currOrder).includes(flight.toUpperCase()) ||
-        Object.keys(currOrder).includes(flight.toLowerCase())
-      ) {
-        newOrder = currOrder[flight].includes(seat)
-          ? {
-              ...currOrder,
-              [flight]: currOrder[flight].filter((seatNum) => seatNum !== seat),
-            }
-          : { ...currOrder, [flight]: [...currOrder[flight], seat] };
-        if (newOrder[flight].length === 0) {
-          delete newOrder[flight];
+    // if (!selectedSeats) {
+    //   setSelectedSeats(
+    //     produce(selectedSeats, (draft) => {
+    //       draft.push({ [`${orderId}`]: { [`${flight}`]: [seat] } });
+    //     })
+    //   );
+    //   return;
+    // }
+    setSelectedSeats(
+      produce(selectedSeats, (draft) => {
+        if (!Object.keys(draft).includes(orderId)) {
+          draft[`${orderId}`] = { [`${flight}`]: [seat] };
+          return;
         }
-        setSelectedSeats({
-          ...selectedSeats,
-          [orderId]: { ...newOrder },
-        });
 
-        return;
-      } else {
-        currOrder[flight] = [seat];
-        setSelectedSeats({
-          ...selectedSeats,
-          [orderId]: { ...currOrder },
-        });
-      }
-    }
+        if (Object.keys(draft).includes(orderId)) {
+          let currOrder = draft[orderId];
+
+          if (
+            Object.keys(currOrder).includes(flight.toUpperCase()) ||
+            Object.keys(currOrder).includes(flight.toLowerCase())
+          ) {
+            if (
+              currOrder[flight].includes(seat) &&
+              currOrder[flight].length > 1
+            ) {
+              currOrder[flight].splice(currOrder[flight].indexOf(seat), 1);
+            } else if (
+              currOrder[flight].includes(seat) &&
+              currOrder[flight].length === 1
+            ) {
+              delete currOrder[flight];
+            } else {
+              currOrder[flight].push(seat);
+            }
+          } else {
+            currOrder[`${flight}`] = [seat];
+          }
+        }
+      })
+    );
   };
 
   const handleCancelReservations = async (e, orderNum) => {
@@ -208,14 +181,20 @@ const ReservationPage = () => {
         });
       });
 
-    const newSelectedSeats = { ...selectedSeats };
-    delete newSelectedSeats[orderNum][flight];
-    setSelectedSeats({ ...newSelectedSeats });
+    // const newSelectedSeats = { ...selectedSeats };
+    // delete newSelectedSeats[orderNum][flight];
+    // setSelectedSeats({ ...newSelectedSeats });
+
+    setSelectedSeats(
+      produce(selectedSeats, (draft) => {
+        delete draft[orderNum][flight];
+      })
+    );
 
     setDisplayAlert({ severity: "success", display: true });
   };
 
-  console.log(selectedSeats);
+  // console.log(selectedSeats);
 
   return (
     <Box>

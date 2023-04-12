@@ -1,41 +1,21 @@
 import * as React from "react";
 import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  useParams,
-} from "react-router-dom";
-import {
   Box,
-  Paper,
   Typography,
-  Button,
-  Fade,
-  Snackbar,
   Stack,
   List,
   ListItem,
-  ListSubheader,
   ListItemButton,
   ListItemIcon,
   IconButton,
   ListItemText,
   Checkbox,
-  Tooltip,
   Card,
   CardHeader,
   CardContent,
-  CardMedia,
   Divider,
 } from "@mui/material";
-import {
-  Logout,
-  Settings,
-  Comment,
-  Delete,
-  AirlinesOutlined,
-} from "@mui/icons-material";
+import { Delete, AirlinesOutlined } from "@mui/icons-material";
 import ReservationContext from "../ReservationContext";
 import logo from "./logo-icon.png";
 
@@ -45,7 +25,6 @@ const ReservationCard = ({
   handleToggle,
   selectSeat,
   checked,
-  setChecked,
   selectedSeats,
 }) => {
   // const { last_name, email } = useParams();
@@ -67,7 +46,7 @@ const ReservationCard = ({
     (prev, curr) => prev + curr.seat.length,
     0
   );
-  console.log(reservedFlightSeatTotal);
+  // console.log(reservedFlightSeatTotal);
 
   React.useEffect(() => {
     if (selectedSeats && selectedSeats[orderItem._id]) {
@@ -82,7 +61,7 @@ const ReservationCard = ({
   }, [selectedSeats]);
 
   // console.log(selectAllFlights);
-  console.log(selectedSeats);
+  // console.log(selectedSeats);
 
   return (
     <Card
@@ -146,11 +125,7 @@ const ReservationCard = ({
               <ListItem
                 key={`order-${index}`}
                 // sx={{ border: "1px solid red" }}
-                divider={
-                  orderItem.order.length > 1 && (
-                    <Divider variant="middle" sx={{ borderBottomWidth: 10 }} />
-                  )
-                }
+                divider={orderItem.order.length > 1 ? true : false}
                 sx={{
                   display: "flex",
                   alignItems: "flex-start",
