@@ -1,33 +1,24 @@
 import {
   Box,
-  Paper,
   Typography,
   Button,
-  Fade,
-  Snackbar,
   Stack,
   List,
   ListItem,
-  ListSubheader,
   ListItemButton,
   ListItemIcon,
   IconButton,
   ListItemText,
   Checkbox,
-  Tooltip,
   Card,
   CardHeader,
   CardContent,
-  CardMedia,
   Divider,
 } from "@mui/material";
 import * as React from "react";
 import ReservationContext from "../ReservationContext";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  Logout,
-  Settings,
-  Comment,
   Delete,
   AirlinesOutlined,
 } from "@mui/icons-material";

@@ -1,30 +1,6 @@
 import * as React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  useParams,
-} from "react-router-dom";
-import {
-  Box,
-  Paper,
-  Typography,
-  Button,
-  Fade,
-  Snackbar,
-  Stack,
-  List,
-  ListItem,
-  ListSubheader,
-  ListItemButton,
-  ListItemIcon,
-  IconButton,
-  ListItemText,
-  Checkbox,
-  Tooltip,
-} from "@mui/material";
-import { Logout, Settings, Comment, Delete } from "@mui/icons-material";
+import { BrowserRouter as Router, useParams } from "react-router-dom";
+import { Box, Typography, List, ListItem, ListSubheader } from "@mui/material";
 import ReservationContext from "../ReservationContext";
 import ReservationCard from "./ReservationCard";
 import produce from "immer";
@@ -218,7 +194,7 @@ const ReservationPage = () => {
     setDisplayAlert({ severity: "success", display: true });
   };
 
-  console.log(selectedSeats);
+  // console.log(selectedSeats);
 
   return (
     <Box>

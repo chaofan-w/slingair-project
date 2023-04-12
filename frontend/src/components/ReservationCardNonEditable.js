@@ -39,15 +39,7 @@ import {
 import ReservationContext from "../ReservationContext";
 import logo from "./logo-icon.png";
 
-const ReservationCardNonEditable = ({
-  orderItem,
-  handleCancelReservations,
-  handleToggle,
-  selectSeat,
-  checked,
-  setChecked,
-  selectedSeats,
-}) => {
+const ReservationCardNonEditable = ({ orderItem }) => {
   // const { last_name, email } = useParams();
   // const [loginUser, setLoginUser] = React.useState(null);
   // const { reservationState, reservationDispatch } =
@@ -95,11 +87,11 @@ const ReservationCardNonEditable = ({
               <ListItem
                 key={`order-${index}`}
                 // sx={{ border: "1px solid red" }}
-                divider={
-                  orderItem.order.length > 1 && (
-                    <Divider variant="middle" sx={{ borderBottomWidth: 10 }} />
-                  )
-                }
+                // divider={
+                //   orderItem.order.length > 1 && (
+                //     <Divider variant="middle" sx={{ borderBottomWidth: 10 }} />
+                //   )
+                // }
                 sx={{
                   display: "flex",
                   alignItems: "flex-start",

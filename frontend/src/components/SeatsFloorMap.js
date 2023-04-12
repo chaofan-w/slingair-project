@@ -1,28 +1,6 @@
 import * as React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  useParams,
-} from "react-router-dom";
-import {
-  Box,
-  Paper,
-  Typography,
-  Button,
-  Fade,
-  Snackbar,
-  Stack,
-  List,
-  ListItem,
-  ListSubheader,
-  ListItemButton,
-  IconButton,
-  Grid,
-  ButtonBase,
-  Tooltip,
-} from "@mui/material";
+import { BrowserRouter as Router, useParams } from "react-router-dom";
+import { Box, Paper, Typography, Stack, Grid, ButtonBase } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import ReservationContext from "../ReservationContext";
 import { Chair } from "@mui/icons-material";
@@ -94,7 +72,7 @@ const SeatsFloorMap = () => {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [flightnum]);
 
   const Item = styled(Paper)(({ theme }) => ({
     backgroundColor:

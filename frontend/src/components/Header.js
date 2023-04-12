@@ -1,18 +1,9 @@
 import * as React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  useNavigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Link, useNavigate } from "react-router-dom";
 import {
   Box,
-  Paper,
   Typography,
   Button,
-  Fade,
-  Snackbar,
   Stack,
   IconButton,
   Icon,
@@ -31,7 +22,6 @@ import {
   Logout,
   Settings,
   BookOnline,
-  EventSeat,
   FlightTakeoffOutlined,
   AirlinesOutlined,
 } from "@mui/icons-material";
@@ -55,13 +45,8 @@ const Header = () => {
     setAnchorFlightEl(null);
   };
   const navigate = useNavigate();
-  const {
-    reservationState,
-    reservationDispatch,
-    displayCheckout,
-    setDisplayCheckout,
-    setDisplaySignIn,
-  } = React.useContext(ReservationContext);
+  const { reservationState, reservationDispatch, setDisplaySignIn } =
+    React.useContext(ReservationContext);
 
   const avatarNameAbbre = (lastName) => {
     return {
